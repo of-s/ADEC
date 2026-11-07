@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADEC - Sistema de Gestão</title>
+
+  <!-- Preview de link (Open Graph) -->
+  <meta property="og:title" content="ADEC - Sistema de Gestão">
+  <meta property="og:description" content="Sistema de gestão da Assembleia de Deus Nova Geração.">
+  <meta property="og:type" content="website">
+
+  <!-- Cliente do Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --bg:#0f1420; --surface:#1a212e; --surface2:#222b3a; --line:#2a3444;
+      --tinta:#e5e9f0; --cinza:#9aa4b2; --azul:#2f6fd6; --azul2:#1c4587;
+      --verde:#22c55e; --vermelho:#f87171;
+    }
+    *{box-sizing:border-box; margin:0; padding:0;}
+    body{
+      font-family:"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg);
+      color:var(--tinta); min-height:100vh; display:flex;
+    }
+    a{color:#8fb6ff;}
+
+    /* ===== MENU LATERAL ===== */
+    .sidebar{
+      width:230px; background:var(--surface); border-right:1px solid var(--line);
+      padding:18px 12px; flex-shrink:0; display:flex; flex-direction:column; gap:4px;
+      position:sticky; top:0; height:100vh; overflow-y:auto;
+    }
+    .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 16px;}
+    .brand .logo{width:38px; height:38px; border-radius:50%; background:var(--azul2);
+      display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff;}
+    .brand .nome{font-size:14px; font-weight:700; line-height:1.1;}
+    .brand .sig{font-size:11px; color:var(--cinza);}
+    .navItem{display:flex; align-items:center; gap:10px; padding:10px 12px;
+      border-radius:10px; cursor:pointer; color:var(--cinza); font-size:14px; font-weight:600;}
+    .navItem:hover{background:var(--surface2); color:var(--tinta);}
+    .navItem.ativo{background:var(--azul2); color:#fff;}
+    .navItem .ic{width:18px; text-align:center;}
+    .navItem .soon{margin-left:auto; font-size:9px; background:var(--surface2);
+      color:var(--cinza); padding:2px 6px; border-radius:20px;}
+
+    /* ===== CONTEUDO ===== */
+    .main{flex:1; min-width:0; display:flex; flex-direction:column;}
+    .topbar{display:flex; align-items:center; gap:12px; padding:14px 20px;
+      border-bottom:1px solid var(--line); background:var(--surface);}
+    .topbar .hamb{display:none; font-size:22px; cursor:pointer; background:none; border:0; color:var(--tinta);}
+    .topbar h1{font-size:16px; font-weight:700;}
+    .content{padding:20px; flex:1;}
+
+    /* ===== AVISO DE CONFIG ===== */
+    .cfgAviso{background:#3a2f12; border:1px solid #6b5320; color:#ffe9a8;
+      border-radius:12px; padding:14px 16px; margin-bottom:18px; font-size:14px; line-height:1.5;}
+    .cfgAviso code{background:rgba(0,0,0,.3); padding:1px 6px; border-radius:6px;}
+
+    /* ===== CARDS ===== */
+    .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:20px;}
+    .card{border-radius:16px; padding:16px; color:#fff; position:relative; overflow:hidden;
+      box-shadow:0 8px 20px -8px rgba(0,0,0,.5);}
+    .card:nth-child(1){background:linear-gradient(135deg,#1c4587,#2f6fd6);}
+    .card:nth-child(2){background:linear-gradient(135deg,#16a34a,#22c55e);}
+    .card:nth-child(3){background:linear-gradient(135deg,#7c3aed,#a855f7);}
+    .card:nth-child(4){background:linear-gradient(135deg,#0891b2,#06b6d4);}
+    .card:nth-child(5){background:linear-gradient(135deg,#f59e0b,#f97316);}
+    .card::after{content:""; position:absolute; right:-20px; top:-20px; width:90px; height:90px;
+      background:rgba(255,255,255,.14); border-radius:50%;}
+    .card .n{font-size:24px; font-weight:800; line-height:1.1;}
+    .card .l{font-size:12px; margin-top:3px; opacity:.92; font-weight:600;}
+
+    /* ===== BARRA DE ACOES ===== */
+    .barra{display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap;}
+    .busca{flex:1; min-width:180px; padding:11px 14px; border:1px solid var(--line);
+      border-radius:12px; font-size:14px; background:var(--surface2); color:var(--tinta);}
+    .busca:focus{outline:none; border-color:var(--azul);}
+    .btn{padding:11px 18px; border:none; border-radius:12px; font-size:13px; font-weight:700;
+      cursor:pointer; background:linear-gradient(135deg,var(--azul2),var(--azul)); color:#fff; white-space:nowrap;}
+    .btn:hover{filter:brightness(1.08);}
+    .btn.sec{background:var(--surface2); color:var(--tinta); border:1px solid var(--line);}
+
+    /* ===== TABELA ===== */
+    .tableWrap{width:100%; overflow-x:auto; border-radius:14px; border:1px solid var(--line);}
+    table{width:100%; border-collapse:collapse; background:var(--surface); min-width:560px;}
+    th,td{text-align:left; padding:12px 14px; font-size:13.5px; border-bottom:1px solid var(--line); white-space:nowrap;}
+    th{background:var(--surface2); color:var(--cinza); font-size:11px; text-transform:uppercase; letter-spacing:.4px;}
+    tbody tr:hover td{background:var(--surface2);}
+    .acao{color:#8fb6ff; cursor:pointer; margin-right:12px; font-weight:600;}
+    .acao.del{color:var(--vermelho);}
+    .acao:hover{text-decoration:underline;}
+    .vazio{text-align:center; color:var(--cinza); padding:30px; white-space:normal;}
+    .cargoTag{display:inline-block; font-size:11px; font-weight:600; color:#bcd2ff;
+      background:rgba(77,139,255,.18); border:1px solid rgba(77,139,255,.35);
+      padding:1px 8px; border-radius:999px;}
+
+    /* ===== MODAL ===== */
+    .overlay{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none;
+      align-items:flex-start; justify-content:center; padding:16px; overflow-y:auto; z-index:100;}
+    .overlay.aberto{display:flex;}
+    .modal{background:var(--surface); border:1px solid var(--line); border-radius:18px;
+      width:100%; max-width:620px; margin:auto; padding:22px;}
+    .modal h3{color:#cfe0ff; margin-bottom:16px;}
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+    .campo{display:flex; flex-direction:column; min-width:0;}
+    .campo.full{grid-column:1 / -1;}
+    label{font-size:12px; color:var(--cinza); margin-bottom:5px; font-weight:700;}
+    input,select,textarea{padding:10px 12px; border:1px solid var(--line); border-radius:10px;
+      font-size:14px; width:100%; background:var(--surface2); color:var(--tinta);}
+    input:focus,select:focus,textarea:focus{outline:none; border-color:var(--azul);}
+    .rodape{display:flex; justify-content:flex-end; gap:10px; margin-top:20px; flex-wrap:wrap;}
+    .msg{padding:10px 12px; border-radius:10px; font-size:13px; margin-top:12px; display:none;}
+    .msg.erro{background:rgba(248,113,113,.15); color:var(--vermelho); display:block;}
+    .msg.ok{background:rgba(34,197,94,.15); color:var(--verde); display:block;}
+    .msg.info{background:rgba(47,111,214,.15); color:#8fb6ff; display:block;}
+
+    /* ===== MOBILE ===== */
+    @media (max-width:860px){
+      .sidebar{position:fixed; left:-240px; z-index:200; transition:left .25s; box-shadow:0 0 40px rgba(0,0,0,.5);}
+      .sidebar.aberto{left:0;}
+      .topbar .hamb{display:block;}
+      .grid{grid-template-columns:1fr;}
+      .cards{grid-template-columns:1fr 1fr;}
+    }
+    @media (max-width:420px){ .cards{grid-template-columns:1fr;} }
+    .backdrop{display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:150;}
+    .backdrop.aberto{display:block;}
+  </style>
+</head>
+<body>
+
+  <!-- ===================== MENU LATERAL ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">AD</div>
+      <div><div class="nome">Assembleia de Deus</div><div class="sig">Nova Geração - ADEC</div></div>
+    </div>
+    <div class="navItem ativo" data-tela="membros"><span class="ic">👥</span> Membros</div>
+    <div class="navItem" data-soon><span class="ic">🙋</span> Visitantes <span class="soon">em breve</span></div>
+    <div class="navItem" data-soon><span class="ic">💰</span> Financeiro <span class="soon">em breve</span></div>
+    <div class="navItem" data-soon><span class="ic">📅</span> Escalas <span class="soon">em breve</span></div>
+    <div class="navItem" data-soon><span class="ic">📖</span> EBD <span class="soon">em breve</span></div>
+    <div class="navItem" data-soon><span class="ic">📊</span> Relatórios <span class="soon">em breve</span></div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- ===================== CONTEUDO ===================== -->
+  <div class="main">
+    <div class="topbar">
+      <button class="hamb" id="hamb">☰</button>
+      <h1 id="tituloTela">Membros</h1>
+    </div>
+
+    <div class="content">
+      <div class="cfgAviso" id="cfgAviso" style="display:none;">
+        ⚠️ <b>Falta configurar a conexão.</b> Abra este arquivo num editor de texto e, lá no topo do
+        código, preencha <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code> com os dados do seu
+        projeto (Supabase → Settings → API). Depois salve e recarregue a página.
+      </div>
+
+      <!-- Cards de estatística -->
+      <div class="cards" id="mCards"></div>
+
+      <!-- Barra -->
+      <div class="barra">
+        <input class="busca" id="mBusca" placeholder="Buscar por nome...">
+        <button class="btn" id="btnNovo">+ Novo membro</button>
+      </div>
+
+      <!-- Tabela -->
+      <div class="tableWrap">
+        <table>
+          <thead><tr><th>Nome</th><th>Idade</th><th>Cidade</th><th>Cargo</th><th></th></tr></thead>
+          <tbody id="mLista"><tr><td colspan="5" class="vazio">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL MEMBRO ===================== -->
+  <div class="overlay" id="mOverlay">
+    <div class="modal">
+      <h3 id="mTitulo">Novo membro</h3>
+      <input type="hidden" id="f_id">
+      <div class="grid">
+        <div class="campo full"><label>Nome completo *</label><input id="f_nome"></div>
+        <div class="campo"><label>Sexo</label>
+          <select id="f_sexo"><option value="">--</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select>
+        </div>
+        <div class="campo"><label>Cargo</label><select id="f_cargo"><option value="">Somente membro</option></select></div>
+        <div class="campo"><label>Nascimento</label><input type="date" id="f_nascimento"></div>
+        <div class="campo"><label>Estado civil</label>
+          <select id="f_estado_civil"><option value="">--</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Viúvo(a)</option><option>Divorciado(a)</option><option>União estável</option></select>
+        </div>
+        <div class="campo"><label>CPF</label><input id="f_cpf" placeholder="somente números"></div>
+        <div class="campo"><label>Telefone</label><input id="f_telefone"></div>
+        <div class="campo"><label>WhatsApp</label><input id="f_whatsapp"></div>
+        <div class="campo full"><label>E-mail</label><input id="f_email"></div>
+        <div class="campo full"><label>Endereço</label><input id="f_endereco"></div>
+        <div class="campo"><label>Bairro</label><input id="f_bairro"></div>
+        <div class="campo"><label>Cidade</label><input id="f_cidade"></div>
+        <div class="campo"><label>Ano de batismo</label><input type="number" id="f_ano_batismo" placeholder="AAAA"></div>
+        <div class="campo"><label>Membro desde (ano)</label><input type="number" id="f_membro_desde" placeholder="AAAA"></div>
+        <div class="campo"><label>Profissão</label><input id="f_profissao"></div>
+        <div class="campo full"><label>Observações</label><textarea id="f_observacoes" rows="2"></textarea></div>
+      </div>
+      <div class="msg" id="mMsg"></div>
+      <div class="rodape">
+        <button class="btn sec" id="btnCancelar">Cancelar</button>
+        <button class="btn" id="btnSalvar">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ========================================================================
+     CONFIGURAÇÃO - preencha com os dados do seu projeto Supabase
+     (Supabase → Settings → API). A anon key pode ficar aqui (é pública).
+     ======================================================================== */
+  const SUPABASE_URL      = 'COLE_SUA_PROJECT_URL_AQUI';
+  const SUPABASE_ANON_KEY = 'sb_publishable_-AcAcxBmyQhTt5OPwuYqLQ_MQRjMZxR';
+  /* ======================================================================== */
+
+  const configOK = !SUPABASE_URL.startsWith('COLE_') && !SUPABASE_ANON_KEY.startsWith('COLE_');
+  let sb = null;
+  if (configOK) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  /* ---------- helpers ---------- */
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function idade(nasc){
+    if(!nasc) return '';
+    const d = new Date(nasc); if(isNaN(d)) return '';
+    const h = new Date(); let a = h.getFullYear()-d.getFullYear();
+    const passou = h.getMonth()>d.getMonth() || (h.getMonth()===d.getMonth() && h.getDate()>=d.getDate());
+    return passou ? a : a-1;
+  }
+  function soDigitos(v){ return String(v||'').replace(/\D/g,''); }
+  function abreviar(nome){ const p=String(nome||'').trim().split(/\s+/); return p.length<=1?p[0]||'':p[0]+' '+p[p.length-1]; }
+
+  /* ---------- menu mobile ---------- */
+  $('hamb').onclick = () => { $('sidebar').classList.toggle('aberto'); $('backdrop').classList.toggle('aberto'); };
+  $('backdrop').onclick = () => { $('sidebar').classList.remove('aberto'); $('backdrop').classList.remove('aberto'); };
+  document.querySelectorAll('[data-soon]').forEach(el => el.onclick = () => alert('Esse módulo entra nas próximas etapas. 🙂'));
+
+  /* ---------- estado ---------- */
+  let cargos = [];          // lista de cargos ativos
+  let membros = [];         // membros ativos carregados
+
+  /* ======================================================================
+     CARGA INICIAL
+     ====================================================================== */
+  async function iniciar(){
+    if(!configOK){ $('cfgAviso').style.display='block'; $('mLista').innerHTML='<tr><td colspan="5" class="vazio">Configure a conexão para carregar os membros.</td></tr>'; $('mCards').innerHTML=''; return; }
+    await carregarCargos();
+    await carregarMembros();
+  }
+
+  async function carregarCargos(){
+    const { data, error } = await sb.from('cargos').select('id,nome').eq('situacao','ativo').order('ordem');
+    if(error){ console.error(error); return; }
+    cargos = data || [];
+    const sel = $('f_cargo');
+    sel.innerHTML = '<option value="">Somente membro</option>' + cargos.map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+  }
+
+  async function carregarMembros(){
+    const { data, error } = await sb
+      .from('membros')
+      .select('*, membros_cargos(cargo_id, situacao, cargos(nome))')
+      .eq('situacao','ativo')
+      .order('nome');
+    if(error){ erroTabela(error.message); return; }
+    membros = data || [];
+    render(membros);
+    renderCards(membros);
+  }
+
+  function cargoDoMembro(m){
+    const link = (m.membros_cargos||[]).find(x => x.situacao==='ativo');
+    return link && link.cargos ? link.cargos.nome : '';
+  }
+
+  function render(lista){
+    const tb = $('mLista');
+    if(!lista.length){ tb.innerHTML='<tr><td colspan="5" class="vazio">Nenhum membro encontrado.</td></tr>'; return; }
+    tb.innerHTML = lista.map(m => {
+      const cg = cargoDoMembro(m);
+      return `<tr>
+        <td>${esc(abreviar(m.nome))}</td>
+        <td>${idade(m.nascimento)!==''?idade(m.nascimento):''}</td>
+        <td>${esc(m.cidade||'')}</td>
+        <td>${cg?`<span class="cargoTag">${esc(cg)}</span>`:''}</td>
+        <td>
+          <span class="acao" data-edit="${m.id}">Editar</span>
+          <span class="acao del" data-del="${m.id}" data-nome="${esc(m.nome)}">Inativar</span>
+        </td></tr>`;
+    }).join('');
+    tb.querySelectorAll('[data-edit]').forEach(el => el.onclick = () => abrirEditar(el.dataset.edit));
+    tb.querySelectorAll('[data-del]').forEach(el => el.onclick = () => inativar(el.dataset.del, el.dataset.nome));
+  }
+
+  function renderCards(lista){
+    const total = lista.length;
+    const h = lista.filter(m=>m.sexo==='masculino').length;
+    const mu = lista.filter(m=>m.sexo==='feminino').length;
+    const bat = lista.filter(m=>m.ano_batismo).length;
+    const mesAtual = new Date().getMonth();
+    const aniv = lista.filter(m=>m.nascimento && new Date(m.nascimento).getMonth()===mesAtual).length;
+    $('mCards').innerHTML =
+      card(total,'Ativos')+card(h,'Homens')+card(mu,'Mulheres')+card(bat,'Batizados')+card(aniv,'Aniversariantes/mês');
+  }
+  function card(n,l){ return `<div class="card"><div class="n">${n||0}</div><div class="l">${l}</div></div>`; }
+
+  function erroTabela(msg){
+    $('mLista').innerHTML = `<tr><td colspan="5" class="vazio">Erro ao carregar: ${esc(msg)}<br><br>
+      Se falar em permissão/RLS, rode o <b>03_policies_dev.sql</b> no Supabase.</td></tr>`;
+  }
+
+  /* ======================================================================
+     BUSCA
+     ====================================================================== */
+  $('mBusca').oninput = () => {
+    const t = $('mBusca').value.trim().toLowerCase();
+    if(!t){ render(membros); return; }
+    render(membros.filter(m => String(m.nome||'').toLowerCase().includes(t)));
+  };
+
+  /* ======================================================================
+     MODAL (novo / editar)
+     ====================================================================== */
+  const campos = ['nome','sexo','cargo','nascimento','estado_civil','cpf','telefone','whatsapp','email','endereco','bairro','cidade','ano_batismo','membro_desde','profissao','observacoes'];
+
+  function limparForm(){ $('f_id').value=''; campos.forEach(c => { const el=$('f_'+c); if(el) el.value=''; }); $('mMsg').className='msg'; }
+
+  $('btnNovo').onclick = () => { limparForm(); $('mTitulo').textContent='Novo membro'; $('mOverlay').classList.add('aberto'); };
+  $('btnCancelar').onclick = () => $('mOverlay').classList.remove('aberto');
+
+  function abrirEditar(id){
+    const m = membros.find(x => x.id===id); if(!m) return;
+    limparForm();
+    $('mTitulo').textContent='Editar membro';
+    $('f_id').value = m.id;
+    ['nome','nascimento','cpf','telefone','whatsapp','email','endereco','bairro','cidade','ano_batismo','membro_desde','profissao','observacoes']
+      .forEach(c => { const el=$('f_'+c); if(el) el.value = m[c]==null?'':m[c]; });
+    $('f_sexo').value = m.sexo||'';
+    $('f_estado_civil').value = m.estado_civil||'';
+    const link = (m.membros_cargos||[]).find(x=>x.situacao==='ativo');
+    $('f_cargo').value = link ? link.cargo_id : '';
+    $('mOverlay').classList.add('aberto');
+  }
+
+  $('btnSalvar').onclick = async () => {
+    const msg = $('mMsg');
+    const nome = $('f_nome').value.trim();
+    if(!nome){ msg.className='msg erro'; msg.textContent='O nome é obrigatório.'; return; }
+
+    const dados = {
+      nome,
+      sexo: $('f_sexo').value || null,
+      nascimento: $('f_nascimento').value || null,
+      estado_civil: $('f_estado_civil').value || null,
+      cpf: soDigitos($('f_cpf').value) || null,
+      telefone: soDigitos($('f_telefone').value) || null,
+      whatsapp: soDigitos($('f_whatsapp').value) || null,
+      email: $('f_email').value.trim().toLowerCase() || null,
+      endereco: $('f_endereco').value.trim() || null,
+      bairro: $('f_bairro').value.trim() || null,
+      cidade: $('f_cidade').value.trim() || null,
+      ano_batismo: $('f_ano_batismo').value ? Number($('f_ano_batismo').value) : null,
+      membro_desde: $('f_membro_desde').value ? Number($('f_membro_desde').value) : null,
+      profissao: $('f_profissao').value.trim() || null,
+      observacoes: $('f_observacoes').value.trim() || null
+    };
+
+    $('btnSalvar').disabled = true;
+    msg.className='msg info'; msg.textContent='Salvando...';
+
+    try{
+      const id = $('f_id').value;
+      let membroId = id;
+      if(id){
+        const { error } = await sb.from('membros').update(dados).eq('id', id);
+        if(error) throw error;
+      } else {
+        const { data, error } = await sb.from('membros').insert(dados).select('id').single();
+        if(error) throw error;
+        membroId = data.id;
+      }
+      // sincroniza cargo (link em membros_cargos)
+      await sb.from('membros_cargos').delete().eq('membro_id', membroId);
+      const cargoId = $('f_cargo').value;
+      if(cargoId){
+        await sb.from('membros_cargos').insert({ membro_id: membroId, cargo_id: cargoId, situacao:'ativo' });
+      }
+      msg.className='msg ok'; msg.textContent='Salvo!';
+      await carregarMembros();
+      setTimeout(() => $('mOverlay').classList.remove('aberto'), 600);
+    }catch(e){
+      msg.className='msg erro'; msg.textContent='Erro: ' + (e.message||e);
+    }finally{
+      $('btnSalvar').disabled = false;
+    }
+  };
+
+  async function inativar(id, nome){
+    if(!confirm(`Inativar o membro "${nome}"?`)) return;
+    const { error } = await sb.from('membros').update({ situacao:'inativo' }).eq('id', id);
+    if(error){ alert('Erro: '+error.message); return; }
+    await carregarMembros();
+  }
+
+  /* ---------- start ---------- */
+  iniciar();
+  </script>
+</body>
+</html>
