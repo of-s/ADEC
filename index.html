@@ -118,6 +118,46 @@
     #login button{width:100%; margin-top:20px;}
     .navItem.sair{margin-top:auto; color:#fda4af;}
     .navItem.sair:hover{background:rgba(248,113,113,.12);}
+    .loginTabs{display:flex; gap:8px; margin:4px 0 2px;}
+    .loginTab{flex:1; padding:9px; border:1px solid var(--line); background:var(--surface2); color:var(--cinza); border-radius:8px; font-weight:600; cursor:pointer; font-size:13px;}
+    .loginTab.ativo{background:var(--azul2); color:#fff; border-color:var(--azul2);}
+    body.papel-membro .soEquipe{display:none;}
+    body.papel-equipe .soMembro{display:none;}
+
+    /* ===== CARTEIRINHA ===== */
+    .cartWrap{max-width:720px; margin:0 auto;}
+    .carteira{background:radial-gradient(circle at 88% 12%,rgba(255,255,255,.12),transparent 42%),linear-gradient(135deg,var(--azul2),#0b3d91); color:#fff; border-radius:18px; padding:22px; box-shadow:0 10px 30px -10px rgba(0,0,0,.6);}
+    .cartTopo{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; font-size:12px; opacity:.9; text-transform:uppercase; letter-spacing:.5px;}
+    .cartTopo .selo{background:#16a34a; padding:4px 12px; border-radius:20px; font-weight:700;}
+    .cartHead{display:flex; gap:16px; align-items:center;}
+    .cartFoto{width:68px; height:68px; border-radius:50%; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:800; border:2px solid rgba(255,255,255,.6); object-fit:cover;}
+    .cartNome{font-size:20px; font-weight:800; line-height:1.1; word-break:break-word;}
+    .cartCargo{font-size:13px; opacity:.9; margin-top:2px;}
+    .cartGrid{display:grid; grid-template-columns:1fr 1fr; gap:14px 16px; margin-top:18px;}
+    .cartItem .rot{font-size:10px; opacity:.75; text-transform:uppercase; letter-spacing:.5px;}
+    .cartItem .val{font-size:15px; font-weight:600; word-break:break-word;}
+    .bloco{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:16px; margin-top:16px;}
+    .bloco h3{color:#cfe0ff; font-size:15px; margin-bottom:10px;}
+    .bloco .linha{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--line); font-size:14px;}
+    .bloco .linha:last-child{border-bottom:none;}
+    .bloco .tot{color:var(--verde); font-weight:800;}
+
+    /* ===== INÍCIO (home) ===== */
+    .inicioWrap{max-width:1000px; margin:0 auto;}
+    .banner{background:linear-gradient(135deg,#1c4587,#2f6fd6); border-radius:18px; padding:40px 20px; text-align:center; color:#fff; box-shadow:0 10px 30px -10px rgba(0,0,0,.5); margin-bottom:16px;}
+    .banner .bTop{font-size:12px; letter-spacing:3px; opacity:.85; text-transform:uppercase;}
+    .banner .bNome{font-size:34px; font-weight:800; margin:4px 0;}
+    .banner .bSub{font-size:14px; opacity:.9;}
+    .proxCulto{background:linear-gradient(135deg,#1c4587,#2f6fd6); border-radius:16px; padding:18px 22px; color:#fff; margin-bottom:16px;}
+    .proxCulto .pTop{font-size:11px; letter-spacing:1px; opacity:.85; text-transform:uppercase;}
+    .proxCulto .pTit{font-size:18px; font-weight:800; margin:4px 0;}
+    .proxCulto .pSub{font-size:13px; opacity:.9;}
+    .inicioCards{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;}
+    .iCard{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px;}
+    .iRot{font-size:11px; color:#8fb6ff; text-transform:uppercase; letter-spacing:.5px; font-weight:700; margin-bottom:8px;}
+    .iNome{font-size:20px; font-weight:800; margin-bottom:6px;}
+    .iTxt{color:var(--cinza); font-size:14px; line-height:1.5;}
+    .iCard .btn{margin-top:12px; display:inline-block; text-decoration:none;}
   </style>
 </head>
 <body>
@@ -128,11 +168,24 @@
       <div class="logoBig">AD</div>
       <h2>Sistema de Gestão</h2>
       <div class="sub">Assembleia de Deus Nova Geração</div>
-      <label>E-mail</label>
-      <input type="email" id="lg_email" autocomplete="username">
-      <label>Senha</label>
-      <input type="password" id="lg_senha" autocomplete="current-password">
-      <button class="btn" id="lg_btn">Entrar</button>
+      <div class="loginTabs">
+        <button class="loginTab ativo" id="tabMembro">Sou membro</button>
+        <button class="loginTab" id="tabAdmin">Administrador</button>
+      </div>
+      <div id="formMembro">
+        <label>CPF</label>
+        <input id="lg_cpf" inputmode="numeric" placeholder="Somente números" autocomplete="off">
+        <label>Data de nascimento</label>
+        <input id="lg_nasc" inputmode="numeric" placeholder="DD/MM/AAAA" maxlength="10">
+        <button class="btn" id="lg_btnMembro">Entrar</button>
+      </div>
+      <div id="formAdmin" style="display:none;">
+        <label>E-mail</label>
+        <input type="email" id="lg_email" autocomplete="username">
+        <label>Senha</label>
+        <input type="password" id="lg_senha" autocomplete="current-password">
+        <button class="btn" id="lg_btn">Entrar</button>
+      </div>
       <div class="msg" id="lg_msg"></div>
     </div>
   </div>
@@ -142,12 +195,16 @@
       <div class="logo">AD</div>
       <div><div class="nome">Assembleia de Deus</div><div class="sig">Nova Geração - ADEC</div></div>
     </div>
-    <div class="navItem ativo" data-tela="membros"><span class="ic">👥</span> Membros</div>
-    <div class="navItem" data-tela="visitantes"><span class="ic">🙋</span> Visitantes</div>
-    <div class="navItem" data-tela="financeiro"><span class="ic">💰</span> Financeiro</div>
-    <div class="navItem" data-tela="escalas"><span class="ic">📅</span> Escalas</div>
+    <div class="navItem ativo" data-tela="inicio"><span class="ic">🏠</span> Início</div>
+    <div class="navItem soMembro" data-tela="carteirinha"><span class="ic">🪪</span> Minha Carteirinha</div>
+    <div class="navItem soEquipe" data-tela="membros"><span class="ic">👥</span> Membros</div>
+    <div class="navItem soEquipe" data-tela="visitantes"><span class="ic">🙋</span> Visitantes</div>
+    <div class="navItem soEquipe" data-tela="financeiro"><span class="ic">💰</span> Financeiro</div>
+    <div class="navItem soEquipe" data-tela="escalas"><span class="ic">📅</span> Escalas</div>
     <div class="navItem" data-tela="ebd"><span class="ic">📖</span> EBD</div>
-    <div class="navItem" data-soon><span class="ic">📊</span> Relatórios <span class="soon">em breve</span></div>
+    <div class="navItem" data-tela="avisos"><span class="ic">🔔</span> Avisos</div>
+    <div class="navItem" data-tela="oracao"><span class="ic">🙏</span> Oração</div>
+    <div class="navItem soEquipe" data-tela="relatorios"><span class="ic">📊</span> Relatórios</div>
     <div class="navItem sair" id="navSair"><span class="ic">🚪</span> Sair</div>
   </aside>
   <div class="backdrop" id="backdrop"></div>
@@ -164,8 +221,26 @@
         <code>SUPABASE_ANON_KEY</code> no topo do código.
       </div>
 
+      <!-- ===================== TELA: INÍCIO ===================== -->
+      <section class="screen ativa" data-screen="inicio">
+        <div class="inicioWrap">
+          <div class="banner">
+            <div class="bTop">Assembleia de Deus</div>
+            <div class="bNome">Nova Geração</div>
+            <div class="bSub">Seja bem-vindo à casa de Deus</div>
+          </div>
+          <div class="proxCulto" id="proxCulto"></div>
+          <div class="inicioCards">
+            <div class="iCard"><div class="iRot">Pastor Presidente</div><div class="iNome" id="iPastor">-</div><div class="iTxt">Que a paz do Senhor esteja com você e sua família.</div></div>
+            <div class="iCard"><div class="iRot">Endereço</div><div class="iTxt" id="iEnd">-</div><a class="btn" id="iMapa" target="_blank" rel="noopener">Ver no mapa</a></div>
+            <div class="iCard"><div class="iRot">Redes sociais</div><div class="iTxt">📷 @somos.novageracao</div></div>
+          </div>
+          <div class="bloco" id="iProgBloco" style="display:none;"><h3>Programação de cultos</h3><div id="iProg"></div></div>
+        </div>
+      </section>
+
       <!-- ===================== TELA: MEMBROS ===================== -->
-      <section class="screen ativa" data-screen="membros">
+      <section class="screen" data-screen="membros">
         <div class="cards" id="mCards"></div>
         <div class="barra">
           <input class="busca" id="mBusca" placeholder="Buscar por nome...">
@@ -240,15 +315,71 @@
 
       <!-- ===================== TELA: EBD ===================== -->
       <section class="screen" data-screen="ebd">
-        <div class="barra">
-          <div style="flex:1; color:var(--cinza); font-size:13px; align-self:center;" id="ebdInfo">Lições da Escola Bíblica Dominical.</div>
-          <button class="btn" id="ebdBtnNova">+ Nova lição</button>
+        <div id="ebdAdmin">
+          <div class="barra">
+            <div style="flex:1; color:var(--cinza); font-size:13px; align-self:center;" id="ebdInfo">Lições da Escola Bíblica Dominical.</div>
+            <button class="btn" id="ebdBtnNova">+ Nova lição</button>
+          </div>
+          <div class="tableWrap">
+            <table>
+              <thead><tr><th>Lição</th><th>Título</th><th>Data</th><th>Link</th><th></th></tr></thead>
+              <tbody id="ebdLista"><tr><td colspan="5" class="vazio">Carregando...</td></tr></tbody>
+            </table>
+          </div>
         </div>
-        <div class="tableWrap">
-          <table>
-            <thead><tr><th>Lição</th><th>Título</th><th>Data</th><th>Link</th><th></th></tr></thead>
-            <tbody id="ebdLista"><tr><td colspan="5" class="vazio">Carregando...</td></tr></tbody>
-          </table>
+        <div id="ebdMembro" style="display:none;"></div>
+      </section>
+
+      <!-- ===================== TELA: RELATÓRIOS ===================== -->
+      <section class="screen" data-screen="relatorios">
+        <div class="barra">
+          <select id="relTipo" class="busca" style="flex:0 0 auto; min-width:200px;">
+            <option value="financeiro">Financeiro</option>
+            <option value="membros">Lista de membros</option>
+            <option value="aniversariantes">Aniversariantes do ano</option>
+            <option value="visitantes">Visitantes</option>
+            <option value="departamentos">Departamentos</option>
+            <option value="ebd">EBD (presenças)</option>
+          </select>
+          <select id="relMes" class="busca" style="flex:0 0 auto; min-width:140px;"></select>
+          <select id="relAno" class="busca" style="flex:0 0 auto; min-width:100px;"></select>
+          <button class="btn" id="relBtn">📄 Gerar PDF</button>
+        </div>
+        <div style="color:var(--cinza); font-size:13px;" id="relInfo">
+          Escolha o relatório e clique em <b>Gerar PDF</b>. Abre uma janela pronta pra imprimir ou salvar como PDF.
+          <br>Se não abrir nada, libere os <b>pop-ups</b> para este site.
+        </div>
+      </section>
+
+      <!-- ===================== TELA: CARTEIRINHA (membro) ===================== -->
+      <section class="screen" data-screen="carteirinha">
+        <div class="cartWrap" id="cartConteudo"><div style="color:var(--cinza);">Carregando...</div></div>
+      </section>
+
+      <!-- ===================== TELA: AVISOS ===================== -->
+      <section class="screen" data-screen="avisos">
+        <div class="barra">
+          <div style="flex:1; color:var(--cinza); font-size:13px; align-self:center;" id="avInfo">Mural de avisos da igreja.</div>
+          <button class="btn soEquipe" id="avBtnNovo">+ Novo aviso</button>
+        </div>
+        <div id="avLista" style="max-width:800px;"><div style="color:var(--cinza);">Carregando...</div></div>
+      </section>
+
+      <!-- ===================== TELA: ORAÇÃO ===================== -->
+      <section class="screen" data-screen="oracao">
+        <div style="max-width:720px;">
+          <div class="bloco soMembro" id="orForm">
+            <h3>Envie seu pedido de oração</h3>
+            <div class="campo full" style="margin-bottom:10px;"><label>Seu nome (opcional)</label><input id="or_nome" placeholder="Deixe em branco para enviar anônimo"></div>
+            <div class="campo full" style="margin-bottom:10px;"><label>Telefone (opcional)</label><input id="or_tel"></div>
+            <div class="campo full"><label>Seu pedido *</label><textarea id="or_pedido" rows="4" placeholder="Escreva aqui o seu pedido de oração..."></textarea></div>
+            <div class="msg" id="orMsg"></div>
+            <div style="margin-top:12px;"><button class="btn" id="orBtnEnviar">Enviar pedido</button></div>
+          </div>
+          <div class="soEquipe" id="orAdmin">
+            <div class="barra"><div style="flex:1; color:var(--cinza); font-size:13px; align-self:center;" id="orAdmInfo">Pedidos recebidos.</div></div>
+            <div id="orLista"><div style="color:var(--cinza);">Carregando...</div></div>
+          </div>
         </div>
       </section>
     </div>
@@ -438,6 +569,22 @@
     </div>
   </div>
 
+  <!-- ===================== MODAL AVISO ===================== -->
+  <div class="overlay" id="avOverlay">
+    <div class="modal">
+      <h3 id="avTitulo">Novo aviso</h3>
+      <input type="hidden" id="av_id">
+      <div class="grid">
+        <div class="campo full"><label>Título *</label><input id="av_titulo"></div>
+        <div class="campo full"><label>Mensagem</label><textarea id="av_conteudo" rows="3"></textarea></div>
+        <div class="campo"><label>Início</label><input type="date" id="av_data_inicio"></div>
+        <div class="campo"><label>Fim</label><input type="date" id="av_data_fim"></div>
+      </div>
+      <div class="msg" id="avMsg"></div>
+      <div class="rodape"><button class="btn sec" id="avBtnCancelar">Cancelar</button><button class="btn" id="avBtnSalvar">Salvar</button></div>
+    </div>
+  </div>
+
   <script>
   /* ========================================================================
      CONFIGURAÇÃO do Supabase (anon/publishable key pode ficar aqui).
@@ -461,7 +608,7 @@
   function card(n,l){ return `<div class="card"><div class="n">${n||0}</div><div class="l">${l}</div></div>`; }
 
   /* ---------- navegacao entre telas ---------- */
-  const titulos = { membros:'Membros', visitantes:'Visitantes', financeiro:'Financeiro', escalas:'Escalas e Departamentos', ebd:'Escola Bíblica Dominical' };
+  const titulos = { inicio:'Início', membros:'Membros', visitantes:'Visitantes', financeiro:'Financeiro', escalas:'Escalas e Departamentos', ebd:'Escola Bíblica Dominical', relatorios:'Relatórios', carteirinha:'Minha Carteirinha', avisos:'Avisos', oracao:'Oração' };
   const jaCarregou = {};
   function irPara(tela){
     document.querySelectorAll('.navItem').forEach(n => n.classList.toggle('ativo', n.dataset.tela===tela));
@@ -469,11 +616,16 @@
     $('tituloTela').textContent = titulos[tela] || tela;
     $('sidebar').classList.remove('aberto'); $('backdrop').classList.remove('aberto');
     if(configOK && !jaCarregou[tela]){ jaCarregou[tela]=true;
+      if(tela==='inicio') Inicio.iniciar();
       if(tela==='membros') Membros.carregar();
       if(tela==='visitantes') Visitantes.carregar();
       if(tela==='financeiro') Financeiro.iniciar();
       if(tela==='escalas') Escalas.iniciar();
       if(tela==='ebd') EBD.iniciar();
+      if(tela==='relatorios') Relatorios.iniciar();
+      if(tela==='carteirinha') Carteirinha.iniciar();
+      if(tela==='avisos') Avisos.iniciar();
+      if(tela==='oracao') Oracao.iniciar();
     }
   }
   document.querySelectorAll('[data-tela]').forEach(el => el.onclick = () => irPara(el.dataset.tela));
@@ -952,6 +1104,10 @@
     pronto:false, classeId:null, membros:[], aulas:[], chAula:null, chMatriculas:{}, chMapa:{},
 
     async iniciar(){
+      const ehMembro = PAPEL==='membro';
+      $('ebdAdmin').style.display = ehMembro ? 'none' : '';
+      $('ebdMembro').style.display = ehMembro ? '' : 'none';
+      if(ehMembro){ await EBD.carregarMembro(); return; }
       if(!EBD.pronto){
         await EBD.garantirClasse();
         const {data}=await sb.from('membros').select('id,nome').eq('situacao','ativo').order('nome');
@@ -959,6 +1115,45 @@
         EBD.pronto=true;
       }
       await EBD.carregar();
+    },
+
+    /* ---- EBD visão do membro (marca a própria presença) ---- */
+    async carregarMembro(){
+      const alvo=$('ebdMembro'); alvo.innerHTML='<div style="color:var(--cinza);">Carregando lições...</div>';
+      const {data:aulas,error}=await sb.from('ebd_aulas').select('*').eq('situacao','ativo').order('data',{ascending:false});
+      if(error){ alvo.innerHTML='<div style="color:var(--vermelho);">Erro: '+esc(error.message)+'</div>'; return; }
+      // minhas matrículas e presenças
+      const {data:mats}=await sb.from('ebd_matriculas').select('id,classe_id').eq('membro_id',MEU_MEMBRO_ID);
+      EBD.minhasMat={}; (mats||[]).forEach(m=>EBD.minhasMat[m.classe_id]=m.id);
+      const {data:ch}=await sb.from('ebd_chamada').select('aula_id,presente');
+      const presPorAula={}; (ch||[]).forEach(c=>presPorAula[c.aula_id]=c.presente);
+      if(!aulas||!aulas.length){ alvo.innerHTML='<div style="color:var(--cinza);">Nenhuma lição cadastrada ainda.</div>'; return; }
+      alvo.innerHTML=aulas.map(a=>{
+        const p=presPorAula[a.id];
+        const badge = p===true?'<span style="color:var(--verde);font-weight:700;">✅ Presença confirmada</span>':(p===false?'<span style="color:var(--vermelho);">Falta</span>':'');
+        const btn = p===true?'':`<button class="btn" data-marcar="${a.id}" data-classe="${a.classe_id||''}" style="padding:7px 14px;font-size:13px;">Marcar presença</button>`;
+        return `<div class="bloco"><h3 style="margin-bottom:4px;">${esc(a.titulo)}</h3>
+          <div style="color:var(--cinza);font-size:13px;">${a.licao?('Lição '+esc(a.licao)+' · '):''}${esc(fmtData(a.data))}</div>
+          ${a.descricao?`<div style="font-size:14px;margin-top:8px;">${esc(a.descricao)}</div>`:''}
+          <div style="display:flex;gap:12px;align-items:center;margin-top:12px;flex-wrap:wrap;">
+            ${a.link?`<a class="btn sec" href="${esc(a.link)}" target="_blank" rel="noopener" style="text-decoration:none;padding:7px 14px;font-size:13px;">Acessar lição</a>`:''}
+            ${btn} ${badge}
+          </div></div>`;
+      }).join('');
+      alvo.querySelectorAll('[data-marcar]').forEach(el=>el.onclick=()=>EBD.marcarMinha(el.dataset.marcar, el.dataset.classe));
+    },
+    async marcarMinha(aulaId, classeId){
+      try{
+        let matId = EBD.minhasMat[classeId];
+        if(!matId){
+          const ins=await sb.from('ebd_matriculas').insert({classe_id:classeId, membro_id:MEU_MEMBRO_ID}).select('id').single();
+          if(ins.error) throw ins.error; matId=ins.data.id; EBD.minhasMat[classeId]=matId;
+        }
+        const {data:exist}=await sb.from('ebd_chamada').select('id').eq('aula_id',aulaId).limit(1);
+        if(exist&&exist.length){ await sb.from('ebd_chamada').update({presente:true}).eq('id',exist[0].id); }
+        else { await sb.from('ebd_chamada').insert({aula_id:aulaId, matricula_id:matId, presente:true}); }
+        await EBD.carregarMembro();
+      }catch(e){ alert('Erro: '+(e.message||e)); }
     },
     async garantirClasse(){
       let {data}=await sb.from('ebd_classes').select('id').eq('nome','Adulto').eq('situacao','ativo').limit(1);
@@ -1051,15 +1246,353 @@
   $('chBtnFechar').onclick=()=>$('chOverlay').classList.remove('aberto');
 
   /* ========================================================================
-     LOGIN (Supabase Auth) - equipe entra por e-mail e senha
+     MÓDULO RELATÓRIOS (gera PDF via impressão do navegador)
      ======================================================================== */
-  function entrarApp(){
+  const Relatorios = {
+    pronto:false, igreja:{nome:'Assembleia de Deus Nova Geração', endereco:'', pastor_presidente:''},
+    periodicos:['financeiro','visitantes','ebd'],
+
+    async iniciar(){
+      if(!Relatorios.pronto){
+        const hoje=new Date();
+        $('relMes').innerHTML='<option value="0">Ano inteiro</option>'+MESES.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+        $('relMes').value=hoje.getMonth()+1;
+        let anos=''; for(let y=hoje.getFullYear()+1; y>=hoje.getFullYear()-5; y--) anos+=`<option value="${y}">${y}</option>`;
+        $('relAno').innerHTML=anos; $('relAno').value=hoje.getFullYear();
+        $('relTipo').onchange=Relatorios.togglePeriodo; Relatorios.togglePeriodo();
+        $('relBtn').onclick=()=>Relatorios.gerar();
+        const {data}=await sb.from('igreja').select('*').limit(1);
+        if(data&&data.length) Relatorios.igreja=data[0];
+        Relatorios.pronto=true;
+      }
+    },
+    togglePeriodo(){
+      const per=Relatorios.periodicos.includes($('relTipo').value);
+      $('relMes').style.display=per?'':'none'; $('relAno').style.display=per?'':'none';
+    },
+    cab(titulo, sub){
+      const ig=Relatorios.igreja;
+      return `<div class="cab"><div class="nome">${esc(ig.nome||'')}</div><div class="end">${esc(ig.endereco||'')}</div></div>
+        <h1>${esc(titulo)}</h1><div class="sub">${esc(sub||'')}</div>`;
+    },
+    rodape(){ const ig=Relatorios.igreja; return `<div class="rod"><span>${ig.pastor_presidente?('Pastor Presidente: '+esc(ig.pastor_presidente)):''}</span><span>Gerado em ${new Date().toLocaleDateString('pt-BR')}</span></div>`; },
+    pcard(v,l){ return `<div class="pcard"><div class="v">${v}</div><div class="l">${esc(l)}</div></div>`; },
+
+    async gerar(){
+      const tipo=$('relTipo').value;
+      $('relBtn').disabled=true; $('relInfo').textContent='Gerando...';
+      try{
+        let corpo='', titulo='', sub='';
+        const mes=Number($('relMes').value), ano=Number($('relAno').value);
+        const comp = mes ? `${ano}-${String(mes).padStart(2,'0')}` : null;
+        const periodoTxt = mes ? `${MESES[mes-1]} / ${ano}` : (Relatorios.periodicos.includes(tipo)?`Ano inteiro - ${ano}`:'Relatório geral');
+
+        if(tipo==='financeiro'){ titulo='Relatório Financeiro'; sub=periodoTxt; corpo=await Relatorios.financeiro(comp, ano); }
+        else if(tipo==='membros'){ titulo='Lista de Membros'; sub='Relatório geral'; corpo=await Relatorios.membros(); }
+        else if(tipo==='aniversariantes'){ titulo='Aniversariantes do Ano'; sub='Relatório geral'; corpo=await Relatorios.aniversariantes(); }
+        else if(tipo==='visitantes'){ titulo='Visitantes'; sub=periodoTxt; corpo=await Relatorios.visitantes(comp, ano); }
+        else if(tipo==='departamentos'){ titulo='Departamentos'; sub='Relatório geral'; corpo=await Relatorios.departamentos(); }
+        else if(tipo==='ebd'){ titulo='Escola Bíblica Dominical'; sub=periodoTxt; corpo=await Relatorios.ebd(comp, ano); }
+
+        Relatorios.imprimir(titulo, Relatorios.cab(titulo, sub)+corpo+Relatorios.rodape());
+      }catch(e){ alert('Erro ao gerar: '+(e.message||e)); }
+      finally{ $('relBtn').disabled=false; $('relInfo').innerHTML='Escolha o relatório e clique em <b>Gerar PDF</b>.'; }
+    },
+
+    noPeriodo(dataISO, comp, ano){
+      if(!dataISO) return false;
+      if(comp) return String(dataISO).slice(0,7)===comp;
+      return String(dataISO).slice(0,4)===String(ano);
+    },
+
+    async financeiro(comp, ano){
+      let q=sb.from('lancamentos').select('*, membros(nome)').eq('situacao','ativo');
+      q = comp ? q.eq('competencia',comp) : q.like('competencia', ano+'-%');
+      const {data}=await q; const L=data||[];
+      const soma=f=>L.filter(f).reduce((s,x)=>s+Number(x.valor||0),0);
+      const entradas=soma(x=>x.tipo==='entrada'), saidas=soma(x=>x.tipo==='saida'&&x.status==='pago');
+      const diz=L.filter(x=>(x.origem||'').toUpperCase()==='DIZIMO');
+      const dizNomes=[...new Set(diz.map(x=>x.membros?x.membros.nome:'').filter(Boolean))].sort();
+      let h=`<div class="cards">${Relatorios.pcard(fmtMoeda(entradas),'Entradas')}${Relatorios.pcard(fmtMoeda(saidas),'Saídas')}${Relatorios.pcard(fmtMoeda(entradas-saidas),'Saldo')}</div>`;
+      h+=`<div class="sec">Dízimos - ${fmtMoeda(soma(x=>(x.origem||'').toUpperCase()==='DIZIMO'))} (${diz.length})</div>`;
+      h+= dizNomes.length ? '<table><thead><tr><th>Dizimistas do período</th></tr></thead><tbody>'+dizNomes.map(n=>`<tr><td>${esc(n)}</td></tr>`).join('')+'</tbody></table>' : '<div class="vazio">Nenhum dizimista no período.</div>';
+      h+=`<div class="sec">Ofertas - ${fmtMoeda(soma(x=>(x.origem||'').toUpperCase()==='OFERTA'))}</div>`;
+      const sa=L.filter(x=>x.tipo==='saida');
+      h+=`<div class="sec">Saídas - ${fmtMoeda(saidas)}</div>`;
+      h+= sa.length ? '<table><thead><tr><th>Descrição</th><th>Status</th><th>Valor</th></tr></thead><tbody>'+sa.map(x=>`<tr><td>${esc(x.descricao||'')}</td><td>${x.status==='pago'?'Paga':'Pendente'}</td><td>${fmtMoeda(x.valor)}</td></tr>`).join('')+'</tbody></table>' : '<div class="vazio">Sem saídas.</div>';
+      return h;
+    },
+    async membros(){
+      const {data}=await sb.from('membros').select('*, membros_cargos(situacao, cargos(nome))').eq('situacao','ativo').order('nome');
+      const L=data||[];
+      let h=`<div class="cards">${Relatorios.pcard(L.length,'Membros ativos')}</div>`;
+      h+='<table><thead><tr><th>Nome</th><th>Nasc.</th><th>Idade</th><th>Telefone</th><th>Cidade</th><th>Cargo</th><th>Batismo</th></tr></thead><tbody>';
+      h+=L.map(m=>{ const cg=(m.membros_cargos||[]).find(x=>x.situacao==='ativo'); const cargo=cg&&cg.cargos?cg.cargos.nome:'';
+        return `<tr><td>${esc(m.nome)}</td><td>${esc(fmtData(m.nascimento))}</td><td>${idade(m.nascimento)}</td><td>${esc(fmtTel(m.telefone))}</td><td>${esc(m.cidade||'')}</td><td>${esc(cargo)}</td><td>${esc(m.ano_batismo||'')}</td></tr>`;
+      }).join('')+'</tbody></table>';
+      return h;
+    },
+    async aniversariantes(){
+      const {data}=await sb.from('membros').select('nome,nascimento').eq('situacao','ativo');
+      const L=(data||[]).filter(m=>m.nascimento);
+      let h='';
+      for(let mi=0; mi<12; mi++){
+        const doMes=L.filter(m=>new Date(m.nascimento).getMonth()===mi).sort((a,b)=>new Date(a.nascimento).getDate()-new Date(b.nascimento).getDate());
+        if(!doMes.length) continue;
+        h+=`<div class="sec">${MESES[mi]}</div><table><thead><tr><th>Dia</th><th>Nome</th><th>Idade</th></tr></thead><tbody>`;
+        h+=doMes.map(m=>{ const d=new Date(m.nascimento); return `<tr><td>${String(d.getDate()).padStart(2,'0')}/${String(mi+1).padStart(2,'0')}</td><td>${esc(m.nome)}</td><td>${idade(m.nascimento)} anos</td></tr>`; }).join('');
+        h+='</tbody></table>';
+      }
+      return h||'<div class="vazio">Nenhum aniversariante.</div>';
+    },
+    async visitantes(comp, ano){
+      const {data}=await sb.from('visitantes').select('*').eq('situacao','ativo').order('data_visita',{ascending:false});
+      const L=(data||[]).filter(v=>Relatorios.noPeriodo(v.data_visita, comp, ano));
+      let h=`<div class="cards">${Relatorios.pcard(L.length,'Visitantes no período')}</div>`;
+      h+= L.length ? '<table><thead><tr><th>Nome</th><th>Data</th><th>Telefone</th><th>Cidade</th><th>Como conheceu</th></tr></thead><tbody>'+L.map(v=>`<tr><td>${esc(v.nome)}</td><td>${esc(fmtData(v.data_visita))}</td><td>${esc(fmtTel(v.telefone))}</td><td>${esc(v.cidade||'')}</td><td>${esc(v.como_conheceu||'')}</td></tr>`).join('')+'</tbody></table>' : '<div class="vazio">Nenhum visitante no período.</div>';
+      return h;
+    },
+    async departamentos(){
+      const {data:deps}=await sb.from('departamentos').select('*').eq('situacao','ativo').order('nome');
+      const {data:membros}=await sb.from('membros').select('id,nome').eq('situacao','ativo');
+      const mapa={}; (membros||[]).forEach(m=>mapa[m.id]=m.nome);
+      const {data:vinc}=await sb.from('membros_departamentos').select('departamento_id, membros(nome)').eq('situacao','ativo');
+      let h='';
+      (deps||[]).forEach(d=>{
+        const parts=(vinc||[]).filter(v=>v.departamento_id===d.id).map(v=>v.membros?v.membros.nome:'').filter(Boolean).sort();
+        h+=`<div class="dep"><div class="dnome">${esc(d.nome)}</div><div class="dlider">Líder: ${esc(mapa[d.lider_membro_id]||'Não definido')}</div>`;
+        h+= parts.length ? `<div class="dpart"><b>Participantes (${parts.length}):</b> ${parts.map(esc).join(', ')}</div>` : '<div class="dpart">Sem participantes.</div>';
+        h+='</div>';
+      });
+      return h||'<div class="vazio">Nenhum departamento.</div>';
+    },
+    async ebd(comp, ano){
+      const {data}=await sb.from('ebd_aulas').select('*').eq('situacao','ativo').order('data');
+      const aulas=(data||[]).filter(a=>Relatorios.noPeriodo(a.data, comp, ano));
+      if(!aulas.length) return '<div class="vazio">Nenhuma aula no período.</div>';
+      const ids=aulas.map(a=>a.id);
+      const {data:ch}=await sb.from('ebd_chamada').select('aula_id, presente').in('aula_id', ids);
+      const presPorAula={}; (ch||[]).forEach(c=>{ if(c.presente) presPorAula[c.aula_id]=(presPorAula[c.aula_id]||0)+1; });
+      const total=Object.values(presPorAula).reduce((s,n)=>s+n,0);
+      let h=`<div class="cards">${Relatorios.pcard(aulas.length,'Aulas')}${Relatorios.pcard(total,'Presenças')}${Relatorios.pcard(aulas.length?Math.round(total/aulas.length):0,'Média')}</div>`;
+      h+='<table><thead><tr><th>Data</th><th>Lição</th><th>Título</th><th>Presentes</th></tr></thead><tbody>';
+      h+=aulas.map(a=>`<tr><td>${esc(fmtData(a.data))}</td><td>${esc(a.licao||'')}</td><td>${esc(a.titulo)}</td><td>${presPorAula[a.id]||0}</td></tr>`).join('')+'</tbody></table>';
+      return h;
+    },
+
+    imprimir(titulo, corpo){
+      const w=window.open('','_blank');
+      if(!w){ alert('Libere os pop-ups para gerar o PDF.'); return; }
+      const css=`*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+        body{margin:0;color:#1f2937;} .wrap{padding:28px 34px;}
+        .cab{border-bottom:3px solid #1d4ed8;padding-bottom:10px;margin-bottom:8px;} .cab .nome{font-size:19px;font-weight:800;color:#1d4ed8;} .cab .end{font-size:11px;color:#4b5563;}
+        h1{font-size:22px;margin:16px 0 2px;} .sub{font-size:13px;font-weight:700;color:#1d4ed8;margin-bottom:12px;}
+        .cards{display:flex;gap:12px;margin:12px 0;} .pcard{flex:1;background:#eef2ff;border:1px solid #dbe3ff;border-radius:10px;padding:12px 14px;} .pcard .v{font-size:18px;font-weight:800;color:#1d4ed8;} .pcard .l{font-size:10px;text-transform:uppercase;color:#6b7280;}
+        .sec{font-size:13px;font-weight:700;color:#1d4ed8;margin:16px 0 6px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;}
+        table{width:100%;border-collapse:collapse;margin:4px 0 8px;} th{background:#1d4ed8;color:#fff;text-align:left;font-size:10px;text-transform:uppercase;padding:7px 9px;} td{padding:7px 9px;border-bottom:1px solid #eef1f6;font-size:11.5px;} tr:nth-child(even) td{background:#f7f9ff;}
+        .vazio{color:#6b7280;font-style:italic;padding:8px 2px;} .dep{border:1px solid #dbe3ff;border-radius:10px;padding:12px 14px;margin-bottom:10px;} .dnome{font-size:14px;font-weight:800;} .dlider{font-size:11.5px;color:#1d4ed8;margin:2px 0 6px;} .dpart{font-size:11.5px;color:#374151;}
+        .rod{margin-top:26px;border-top:1px solid #e5e7eb;padding-top:8px;display:flex;justify-content:space-between;font-size:10.5px;color:#4b5563;}
+        @page{size:A4;margin:14mm;}`;
+      w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(titulo)}</title><style>${css}</style></head><body><div class="wrap">${corpo}</div><script>window.onload=function(){setTimeout(function(){window.print();},200);}<\/script></body></html>`);
+      w.document.close();
+    }
+  };
+
+  /* ========================================================================
+     MÓDULO INÍCIO (home das duas visões)
+     ======================================================================== */
+  const DIAS_SEM = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+  const Inicio = {
+    async iniciar(){
+      // Próximo domingo
+      const hoje=new Date(); const base=new Date(hoje.getFullYear(),hoje.getMonth(),hoje.getDate());
+      const prox=new Date(base); while(prox.getDay()!==0) prox.setDate(prox.getDate()+1);
+      const dias=Math.round((prox-base)/86400000);
+      const dataFmt=String(prox.getDate()).padStart(2,'0')+'/'+String(prox.getMonth()+1).padStart(2,'0');
+      const quando = dias===0 ? 'é hoje!' : (dias===1 ? 'é amanhã' : 'faltam '+dias+' dias');
+      // Programação do domingo (se houver), para o subtítulo
+      let sub='';
+      try{
+        const {data}=await sb.from('programacao_cultos').select('*, tipos_culto(nome)').eq('situacao','ativo').eq('dia_semana',0).order('hora_inicio');
+        if(data&&data.length){ const p=data[0]; const nome=p.tipos_culto?p.tipos_culto.nome:(p.observacoes||'Culto'); sub=`${esc(nome)}${p.hora_inicio?' · '+p.hora_inicio.slice(0,5):''}${p.hora_fim?' - '+p.hora_fim.slice(0,5):''}`; }
+      }catch(e){}
+      $('proxCulto').innerHTML=`<div class="pTop">Próximo culto</div><div class="pTit">🙏 Próximo culto é Domingo (${dataFmt}), ${quando}</div>${sub?`<div class="pSub">${sub}</div>`:''}`;
+
+      // Dados da igreja
+      try{
+        const {data:ig}=await sb.from('igreja').select('*').limit(1).maybeSingle();
+        if(ig){
+          $('iPastor').textContent=ig.pastor_presidente||'-';
+          $('iEnd').textContent=ig.endereco||'-';
+          if(ig.endereco) $('iMapa').href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(ig.endereco);
+        }
+      }catch(e){}
+
+      // Programação completa
+      try{
+        const {data}=await sb.from('programacao_cultos').select('*, tipos_culto(nome)').eq('situacao','ativo').order('dia_semana').order('hora_inicio');
+        if(data&&data.length){
+          const porDia={}; data.forEach(p=>{ (porDia[p.dia_semana]=porDia[p.dia_semana]||[]).push(p); });
+          let h='';
+          Object.keys(porDia).sort((a,b)=>a-b).forEach(d=>{
+            h+=`<div style="color:#8fb6ff;font-weight:700;margin:10px 0 4px;">${DIAS_SEM[d]}</div>`;
+            porDia[d].forEach(p=>{ const nome=p.tipos_culto?p.tipos_culto.nome:(p.observacoes||'Culto'); h+=`<div class="linha"><span>${esc(nome)}</span><span style="color:var(--cinza);">${p.hora_inicio?p.hora_inicio.slice(0,5):''}${p.hora_fim?' - '+p.hora_fim.slice(0,5):''}</span></div>`; });
+          });
+          $('iProg').innerHTML=h; $('iProgBloco').style.display='';
+        }
+      }catch(e){}
+    }
+  };
+
+  /* ========================================================================
+     MÓDULO CARTEIRINHA (visão do membro)
+     ======================================================================== */
+  const Carteirinha = {
+    pronto:false,
+    async iniciar(){
+      const alvo=$('cartConteudo'); alvo.innerHTML='<div style="color:var(--cinza);">Carregando...</div>';
+      try{
+        const { data:m } = await sb.from('membros')
+          .select('*, membros_cargos(situacao, cargos(nome)), membros_departamentos(funcao, situacao, departamentos(nome))')
+          .limit(1).maybeSingle();
+        if(!m){ alvo.innerHTML='<div style="color:var(--cinza);">Não encontramos seus dados. Fale com a secretaria.</div>'; return; }
+        const { data:ig } = await sb.from('igreja').select('*').limit(1).maybeSingle();
+        const { data:diz } = await sb.from('lancamentos').select('data,competencia,valor').eq('origem','DIZIMO').eq('situacao','ativo').order('data',{ascending:false});
+        Carteirinha.render(m, ig||{}, diz||[]);
+      }catch(e){ alvo.innerHTML='<div style="color:var(--vermelho);">Erro: '+esc(e.message||e)+'</div>'; }
+    },
+    render(m, ig, diz){
+      const cargo=(m.membros_cargos||[]).find(x=>x.situacao==='ativo'); const cargoNome=cargo&&cargo.cargos?cargo.cargos.nome:'Membro';
+      const deptos=(m.membros_departamentos||[]).filter(x=>x.situacao==='ativo');
+      const ini=(m.nome||'?').trim().split(/\s+/).map(p=>p[0]).slice(0,2).join('').toUpperCase();
+      const foto = m.foto_url ? `<img class="cartFoto" src="${esc(m.foto_url)}" alt="">` : `<div class="cartFoto">${esc(ini)}</div>`;
+      const totalDiz=diz.reduce((s,x)=>s+Number(x.valor||0),0);
+      const porAno={}; diz.forEach(x=>{ const a=(x.competencia||x.data||'').slice(0,4); if(a) porAno[a]=(porAno[a]||0)+Number(x.valor||0); });
+
+      let h=`<div class="carteira">
+        <div class="cartTopo"><span>${esc(ig.nome||'ADEC')}</span><span class="selo">Ativo</span></div>
+        <div class="cartHead">${foto}<div><div class="cartNome">${esc(m.nome)}</div><div class="cartCargo">${esc(cargoNome)}</div>${m.membro_desde?`<div class="cartCargo">Membro desde ${esc(m.membro_desde)}</div>`:''}</div></div>
+        <div class="cartGrid">
+          <div class="cartItem"><div class="rot">CPF</div><div class="val">${esc(m.cpf||'-')}</div></div>
+          <div class="cartItem"><div class="rot">Nascimento</div><div class="val">${esc(fmtData(m.nascimento))}${idade(m.nascimento)!==''?` (${idade(m.nascimento)} anos)`:''}</div></div>
+          <div class="cartItem"><div class="rot">Batismo</div><div class="val">${m.ano_batismo?('Sim - '+esc(m.ano_batismo)):'Não informado'}</div></div>
+          <div class="cartItem"><div class="rot">Cidade</div><div class="val">${esc(m.cidade||'-')}</div></div>
+        </div></div>`;
+
+      if(deptos.length){
+        h+=`<div class="bloco"><h3>Meus departamentos</h3>`+deptos.map(d=>`<div class="linha"><span>${esc(d.departamentos?d.departamentos.nome:'-')}</span><span style="color:var(--cinza);">${esc(d.funcao||'')}</span></div>`).join('')+`</div>`;
+      }
+
+      h+=`<div class="bloco"><h3>Meus dízimos</h3>`;
+      if(!diz.length){ h+=`<div style="color:var(--cinza); font-size:14px;">Você ainda não tem dízimos registrados.</div>`; }
+      else{
+        h+=`<div class="linha"><span>Total entregue</span><span class="tot">${fmtMoeda(totalDiz)}</span></div>`;
+        Object.keys(porAno).sort().reverse().forEach(a=>{ h+=`<div class="linha"><span>${esc(a)}</span><span>${fmtMoeda(porAno[a])}</span></div>`; });
+      }
+      h+=`</div>`;
+      $('cartConteudo').innerHTML=h;
+    }
+  };
+
+  /* ========================================================================
+     MÓDULO AVISOS
+     ======================================================================== */
+  const Avisos = {
+    async iniciar(){
+      const alvo=$('avLista'); alvo.innerHTML='<div style="color:var(--cinza);">Carregando...</div>';
+      const {data,error}=await sb.from('avisos').select('*').eq('situacao','ativo').order('created_at',{ascending:false});
+      if(error){ alvo.innerHTML='<div style="color:var(--vermelho);">Erro: '+esc(error.message)+'</div>'; return; }
+      const L=data||[];
+      if(!L.length){ alvo.innerHTML='<div style="color:var(--cinza);">Nenhum aviso no momento.</div>'; return; }
+      const admin=PAPEL==='equipe';
+      alvo.innerHTML=L.map(a=>`<div class="bloco"><div style="display:flex;justify-content:space-between;gap:10px;align-items:start;">
+        <h3 style="margin:0;">${esc(a.titulo)}</h3>
+        ${admin?`<span style="display:flex;gap:10px;"><span class="acao" data-edit="${a.id}">Editar</span><span class="acao del" data-del="${a.id}">Excluir</span></span>`:''}</div>
+        ${a.conteudo?`<div style="font-size:14px;margin-top:8px;color:var(--tinta);">${esc(a.conteudo)}</div>`:''}
+        ${(a.data_inicio||a.data_fim)?`<div style="font-size:12px;color:var(--cinza);margin-top:8px;">${a.data_inicio?fmtData(a.data_inicio):''}${a.data_fim?' até '+fmtData(a.data_fim):''}</div>`:''}
+      </div>`).join('');
+      if(admin){
+        alvo.querySelectorAll('[data-edit]').forEach(el=>el.onclick=()=>Avisos.editar(el.dataset.edit, L));
+        alvo.querySelectorAll('[data-del]').forEach(el=>el.onclick=()=>Avisos.excluir(el.dataset.del));
+      }
+    },
+    novo(){ ['id','titulo','conteudo','data_inicio','data_fim'].forEach(c=>$('av_'+c).value=''); $('avTitulo').textContent='Novo aviso'; $('avMsg').className='msg'; $('avOverlay').classList.add('aberto'); },
+    editar(id, L){ const a=L.find(x=>x.id===id); if(!a) return; $('av_id').value=a.id; $('av_titulo').value=a.titulo||''; $('av_conteudo').value=a.conteudo||''; $('av_data_inicio').value=(a.data_inicio||'').slice(0,10); $('av_data_fim').value=(a.data_fim||'').slice(0,10); $('avTitulo').textContent='Editar aviso'; $('avMsg').className='msg'; $('avOverlay').classList.add('aberto'); },
+    async salvar(){
+      const msg=$('avMsg'); const titulo=$('av_titulo').value.trim();
+      if(!titulo){ msg.className='msg erro'; msg.textContent='Informe o título.'; return; }
+      const reg={ titulo, conteudo:$('av_conteudo').value.trim()||null, data_inicio:$('av_data_inicio').value||null, data_fim:$('av_data_fim').value||null };
+      $('avBtnSalvar').disabled=true; msg.className='msg info'; msg.textContent='Salvando...';
+      const id=$('av_id').value;
+      const {error}= id ? await sb.from('avisos').update(reg).eq('id',id) : await sb.from('avisos').insert(reg);
+      $('avBtnSalvar').disabled=false;
+      if(error){ msg.className='msg erro'; msg.textContent='Erro: '+error.message; return; }
+      $('avOverlay').classList.remove('aberto'); Avisos.iniciar();
+    },
+    async excluir(id){ if(!confirm('Excluir este aviso?')) return;
+      const {error}=await sb.from('avisos').update({situacao:'inativo'}).eq('id',id);
+      if(error){ alert('Erro: '+error.message); return; } Avisos.iniciar(); }
+  };
+  $('avBtnNovo').onclick=()=>Avisos.novo();
+  $('avBtnCancelar').onclick=()=>$('avOverlay').classList.remove('aberto');
+  $('avBtnSalvar').onclick=()=>Avisos.salvar();
+
+  /* ========================================================================
+     MÓDULO ORAÇÃO (membro envia; equipe lê e gerencia)
+     ======================================================================== */
+  const Oracao = {
+    async iniciar(){
+      if(PAPEL==='equipe'){
+        const alvo=$('orLista'); alvo.innerHTML='<div style="color:var(--cinza);">Carregando...</div>';
+        const {data,error}=await sb.from('pedidos_oracao').select('*').eq('situacao','ativo').order('created_at',{ascending:false});
+        if(error){ alvo.innerHTML='<div style="color:var(--vermelho);">Erro: '+esc(error.message)+'</div>'; return; }
+        const L=data||[];
+        $('orAdmInfo').textContent=`${L.length} pedido(s) recebido(s).`;
+        alvo.innerHTML = L.length ? L.map(p=>`<div class="bloco"><div style="display:flex;justify-content:space-between;gap:10px;">
+          <strong>${esc(p.nome||'Anônimo')}</strong><span class="acao del" data-del="${p.id}">Excluir</span></div>
+          <div style="font-size:14px;margin-top:6px;white-space:pre-wrap;">${esc(p.pedido)}</div>
+          ${p.telefone?`<div style="font-size:12px;color:var(--cinza);margin-top:6px;">Tel: ${esc(p.telefone)}</div>`:''}</div>`).join('')
+          : '<div style="color:var(--cinza);">Nenhum pedido no momento.</div>';
+        alvo.querySelectorAll('[data-del]').forEach(el=>el.onclick=()=>Oracao.excluir(el.dataset.del));
+      }
+    },
+    async enviar(){
+      const msg=$('orMsg'); const pedido=$('or_pedido').value.trim();
+      if(!pedido){ msg.className='msg erro'; msg.textContent='Escreva o seu pedido.'; return; }
+      $('orBtnEnviar').disabled=true; msg.className='msg info'; msg.textContent='Enviando...';
+      const {error}=await sb.from('pedidos_oracao').insert({ nome:$('or_nome').value.trim()||null, telefone:$('or_tel').value.trim()||null, pedido });
+      $('orBtnEnviar').disabled=false;
+      if(error){ msg.className='msg erro'; msg.textContent='Erro: '+error.message; return; }
+      msg.className='msg ok'; msg.textContent='Pedido enviado! Estaremos orando por você. 🙏';
+      $('or_nome').value=''; $('or_tel').value=''; $('or_pedido').value='';
+    },
+    async excluir(id){ if(!confirm('Remover este pedido?')) return;
+      const {error}=await sb.from('pedidos_oracao').update({situacao:'inativo'}).eq('id',id);
+      if(error){ alert('Erro: '+error.message); return; } Oracao.iniciar(); }
+  };
+  $('orBtnEnviar').onclick=()=>Oracao.enviar();
+
+  /* ========================================================================
+     LOGIN (equipe por e-mail/senha; membro por CPF + nascimento)
+     ======================================================================== */
+  let PAPEL='equipe'; let MEU_MEMBRO_ID=null;
+  function aplicarPapel(session){
+    const meta = (session && session.user && session.user.user_metadata) || {};
+    PAPEL = (meta.role==='membro') ? 'membro' : 'equipe';
+    MEU_MEMBRO_ID = meta.membro_id || null;
+    document.body.classList.remove('papel-membro','papel-equipe');
+    document.body.classList.add(PAPEL==='membro'?'papel-membro':'papel-equipe');
+  }
+  function entrarApp(session){
+    aplicarPapel(session);
     document.body.classList.add('logado');
-    if(!jaCarregou.membros){ jaCarregou.membros=true; Membros.carregar(); }
+    for(const k in jaCarregou) delete jaCarregou[k];
+    irPara('inicio');
   }
   function sairApp(){ document.body.classList.remove('logado'); }
 
-  async function fazerLogin(){
+  // --- admin ---
+  async function loginAdmin(){
     const msg=$('lg_msg'); const email=$('lg_email').value.trim(); const senha=$('lg_senha').value;
     if(!email || !senha){ msg.className='msg erro'; msg.textContent='Preencha e-mail e senha.'; return; }
     $('lg_btn').disabled=true; msg.className='msg info'; msg.textContent='Entrando...';
@@ -1068,17 +1601,48 @@
     if(error){ msg.className='msg erro'; msg.textContent = error.message.includes('Invalid') ? 'E-mail ou senha incorretos.' : error.message; return; }
     msg.className='msg';
   }
+  // --- membro (CPF + nascimento) ---
+  function nascParaISO(s){ s=(s||'').trim(); const m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/); return m?`${m[3]}-${m[2]}-${m[1]}`:s; }
+  async function loginMembro(){
+    const msg=$('lg_msg');
+    const cpf=($('lg_cpf').value||'').replace(/\D/g,'');
+    const nasc=nascParaISO($('lg_nasc').value);
+    if(!cpf || !/^\d{4}-\d{2}-\d{2}$/.test(nasc)){ msg.className='msg erro'; msg.textContent='Preencha o CPF e a data (DD/MM/AAAA).'; return; }
+    $('lg_btnMembro').disabled=true; msg.className='msg info'; msg.textContent='Entrando...';
+    try{
+      const resp = await fetch(`${SUPABASE_URL}/functions/v1/login-membro`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'apikey':SUPABASE_ANON_KEY, 'Authorization':'Bearer '+SUPABASE_ANON_KEY },
+        body: JSON.stringify({ cpf, nascimento: nasc })
+      });
+      const r = await resp.json();
+      if(!resp.ok){ msg.className='msg erro'; msg.textContent = r.error || 'Não encontramos seu cadastro.'; $('lg_btnMembro').disabled=false; return; }
+      const { error } = await sb.auth.signInWithPassword({ email:r.email, password:r.password });
+      $('lg_btnMembro').disabled=false;
+      if(error){ msg.className='msg erro'; msg.textContent='Erro ao entrar: '+error.message; return; }
+      msg.className='msg';
+    }catch(e){
+      $('lg_btnMembro').disabled=false; msg.className='msg erro';
+      msg.textContent='Login de membro indisponível. A função "login-membro" precisa estar instalada no Supabase.';
+    }
+  }
+  // máscara simples de data
+  if(document.getElementById('lg_nasc')) $('lg_nasc').oninput=e=>{ let s=e.target.value.replace(/\D/g,'').slice(0,8); if(s.length>4)s=s.slice(0,2)+'/'+s.slice(2,4)+'/'+s.slice(4); else if(s.length>2)s=s.slice(0,2)+'/'+s.slice(2); e.target.value=s; };
 
   if(configOK){
-    $('lg_btn').onclick = fazerLogin;
-    $('lg_senha').addEventListener('keydown', e => { if(e.key==='Enter') fazerLogin(); });
+    $('tabMembro').onclick=()=>{ $('tabMembro').classList.add('ativo'); $('tabAdmin').classList.remove('ativo'); $('formMembro').style.display=''; $('formAdmin').style.display='none'; $('lg_msg').className='msg'; };
+    $('tabAdmin').onclick=()=>{ $('tabAdmin').classList.add('ativo'); $('tabMembro').classList.remove('ativo'); $('formAdmin').style.display=''; $('formMembro').style.display='none'; $('lg_msg').className='msg'; };
+    $('lg_btn').onclick=loginAdmin;
+    $('lg_btnMembro').onclick=loginMembro;
+    $('lg_senha').addEventListener('keydown', e=>{ if(e.key==='Enter') loginAdmin(); });
+    $('lg_nasc').addEventListener('keydown', e=>{ if(e.key==='Enter') loginMembro(); });
     $('navSair').onclick = async () => { await sb.auth.signOut(); };
-    sb.auth.onAuthStateChange((_evt, session) => { if(session) entrarApp(); else sairApp(); });
+    sb.auth.onAuthStateChange((_evt, session) => { if(session) entrarApp(session); else sairApp(); });
   }
 
   /* ---------- start ---------- */
-  if(!configOK){ $('cfgAviso').style.display='block'; document.body.classList.add('logado'); }
-  else { sb.auth.getSession().then(({data}) => { if(data.session) entrarApp(); else sairApp(); }); }
+  if(!configOK){ $('cfgAviso').style.display='block'; document.body.classList.add('logado','papel-equipe'); }
+  else { sb.auth.getSession().then(({data}) => { if(data.session) entrarApp(data.session); else sairApp(); }); }
   </script>
 </body>
 </html>
