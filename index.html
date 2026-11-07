@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ADEC - Sistema de Gestão</title>
 
-  <!-- Preview de link (Open Graph) -->
   <meta property="og:title" content="ADEC - Sistema de Gestão">
   <meta property="og:description" content="Sistema de gestão da Assembleia de Deus Nova Geração.">
   <meta property="og:type" content="website">
 
-  <!-- Cliente do Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -20,95 +18,75 @@
       --verde:#22c55e; --vermelho:#f87171;
     }
     *{box-sizing:border-box; margin:0; padding:0;}
-    body{
-      font-family:"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg);
-      color:var(--tinta); min-height:100vh; display:flex;
-    }
+    body{font-family:"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--tinta); min-height:100vh; display:flex;}
     a{color:#8fb6ff;}
 
-    /* ===== MENU LATERAL ===== */
-    .sidebar{
-      width:230px; background:var(--surface); border-right:1px solid var(--line);
-      padding:18px 12px; flex-shrink:0; display:flex; flex-direction:column; gap:4px;
-      position:sticky; top:0; height:100vh; overflow-y:auto;
-    }
+    .sidebar{width:230px; background:var(--surface); border-right:1px solid var(--line); padding:18px 12px;
+      flex-shrink:0; display:flex; flex-direction:column; gap:4px; position:sticky; top:0; height:100vh; overflow-y:auto;}
     .brand{display:flex; align-items:center; gap:10px; padding:6px 8px 16px;}
-    .brand .logo{width:38px; height:38px; border-radius:50%; background:var(--azul2);
-      display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff;}
+    .brand .logo{width:38px; height:38px; border-radius:50%; background:var(--azul2); display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff;}
     .brand .nome{font-size:14px; font-weight:700; line-height:1.1;}
     .brand .sig{font-size:11px; color:var(--cinza);}
-    .navItem{display:flex; align-items:center; gap:10px; padding:10px 12px;
-      border-radius:10px; cursor:pointer; color:var(--cinza); font-size:14px; font-weight:600;}
+    .navItem{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; cursor:pointer; color:var(--cinza); font-size:14px; font-weight:600;}
     .navItem:hover{background:var(--surface2); color:var(--tinta);}
     .navItem.ativo{background:var(--azul2); color:#fff;}
     .navItem .ic{width:18px; text-align:center;}
-    .navItem .soon{margin-left:auto; font-size:9px; background:var(--surface2);
-      color:var(--cinza); padding:2px 6px; border-radius:20px;}
+    .navItem .soon{margin-left:auto; font-size:9px; background:var(--surface2); color:var(--cinza); padding:2px 6px; border-radius:20px;}
 
-    /* ===== CONTEUDO ===== */
     .main{flex:1; min-width:0; display:flex; flex-direction:column;}
-    .topbar{display:flex; align-items:center; gap:12px; padding:14px 20px;
-      border-bottom:1px solid var(--line); background:var(--surface);}
+    .topbar{display:flex; align-items:center; gap:12px; padding:14px 20px; border-bottom:1px solid var(--line); background:var(--surface);}
     .topbar .hamb{display:none; font-size:22px; cursor:pointer; background:none; border:0; color:var(--tinta);}
     .topbar h1{font-size:16px; font-weight:700;}
     .content{padding:20px; flex:1;}
+    .screen{display:none;} .screen.ativa{display:block;}
 
-    /* ===== AVISO DE CONFIG ===== */
-    .cfgAviso{background:#3a2f12; border:1px solid #6b5320; color:#ffe9a8;
-      border-radius:12px; padding:14px 16px; margin-bottom:18px; font-size:14px; line-height:1.5;}
+    .cfgAviso{background:#3a2f12; border:1px solid #6b5320; color:#ffe9a8; border-radius:12px; padding:14px 16px; margin-bottom:18px; font-size:14px; line-height:1.5;}
     .cfgAviso code{background:rgba(0,0,0,.3); padding:1px 6px; border-radius:6px;}
 
-    /* ===== CARDS ===== */
     .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:20px;}
-    .card{border-radius:16px; padding:16px; color:#fff; position:relative; overflow:hidden;
-      box-shadow:0 8px 20px -8px rgba(0,0,0,.5);}
+    .card{border-radius:16px; padding:16px; color:#fff; position:relative; overflow:hidden; box-shadow:0 8px 20px -8px rgba(0,0,0,.5);}
     .card:nth-child(1){background:linear-gradient(135deg,#1c4587,#2f6fd6);}
     .card:nth-child(2){background:linear-gradient(135deg,#16a34a,#22c55e);}
     .card:nth-child(3){background:linear-gradient(135deg,#7c3aed,#a855f7);}
     .card:nth-child(4){background:linear-gradient(135deg,#0891b2,#06b6d4);}
     .card:nth-child(5){background:linear-gradient(135deg,#f59e0b,#f97316);}
-    .card::after{content:""; position:absolute; right:-20px; top:-20px; width:90px; height:90px;
-      background:rgba(255,255,255,.14); border-radius:50%;}
+    .card::after{content:""; position:absolute; right:-20px; top:-20px; width:90px; height:90px; background:rgba(255,255,255,.14); border-radius:50%;}
     .card .n{font-size:24px; font-weight:800; line-height:1.1;}
     .card .l{font-size:12px; margin-top:3px; opacity:.92; font-weight:600;}
 
-    /* ===== BARRA DE ACOES ===== */
     .barra{display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap;}
-    .busca{flex:1; min-width:180px; padding:11px 14px; border:1px solid var(--line);
-      border-radius:12px; font-size:14px; background:var(--surface2); color:var(--tinta);}
+    .busca{flex:1; min-width:180px; padding:11px 14px; border:1px solid var(--line); border-radius:12px; font-size:14px; background:var(--surface2); color:var(--tinta);}
     .busca:focus{outline:none; border-color:var(--azul);}
-    .btn{padding:11px 18px; border:none; border-radius:12px; font-size:13px; font-weight:700;
-      cursor:pointer; background:linear-gradient(135deg,var(--azul2),var(--azul)); color:#fff; white-space:nowrap;}
+    .btn{padding:11px 18px; border:none; border-radius:12px; font-size:13px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,var(--azul2),var(--azul)); color:#fff; white-space:nowrap;}
     .btn:hover{filter:brightness(1.08);}
     .btn.sec{background:var(--surface2); color:var(--tinta); border:1px solid var(--line);}
 
-    /* ===== TABELA ===== */
+    .subtabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px;}
+    .subtab{background:var(--surface2); color:var(--cinza); border:1px solid var(--line); border-radius:10px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer;}
+    .subtab.ativo{background:var(--azul2); color:#fff; border-color:var(--azul2);}
     .tableWrap{width:100%; overflow-x:auto; border-radius:14px; border:1px solid var(--line);}
     table{width:100%; border-collapse:collapse; background:var(--surface); min-width:560px;}
     th,td{text-align:left; padding:12px 14px; font-size:13.5px; border-bottom:1px solid var(--line); white-space:nowrap;}
     th{background:var(--surface2); color:var(--cinza); font-size:11px; text-transform:uppercase; letter-spacing:.4px;}
     tbody tr:hover td{background:var(--surface2);}
-    .acao{color:#8fb6ff; cursor:pointer; margin-right:12px; font-weight:600;}
-    .acao.del{color:var(--vermelho);}
+    .acao{color:#8fb6ff; cursor:pointer; margin-right:10px; font-weight:600;}
+    .acao.del{color:var(--vermelho);} .acao.conv{color:#4ade80;}
     .acao:hover{text-decoration:underline;}
     .vazio{text-align:center; color:var(--cinza); padding:30px; white-space:normal;}
-    .cargoTag{display:inline-block; font-size:11px; font-weight:600; color:#bcd2ff;
-      background:rgba(77,139,255,.18); border:1px solid rgba(77,139,255,.35);
-      padding:1px 8px; border-radius:999px;}
+    .cargoTag{display:inline-block; font-size:11px; font-weight:600; color:#bcd2ff; background:rgba(77,139,255,.18); border:1px solid rgba(77,139,255,.35); padding:1px 8px; border-radius:999px;}
 
-    /* ===== MODAL ===== */
-    .overlay{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none;
-      align-items:flex-start; justify-content:center; padding:16px; overflow-y:auto; z-index:100;}
+    .overlay{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:flex-start; justify-content:center; padding:16px; overflow-y:auto; z-index:100;}
     .overlay.aberto{display:flex;}
-    .modal{background:var(--surface); border:1px solid var(--line); border-radius:18px;
-      width:100%; max-width:620px; margin:auto; padding:22px;}
+    .modal{background:var(--surface); border:1px solid var(--line); border-radius:18px; width:100%; max-width:620px; margin:auto; padding:22px;}
     .modal h3{color:#cfe0ff; margin-bottom:16px;}
     .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
     .campo{display:flex; flex-direction:column; min-width:0;}
     .campo.full{grid-column:1 / -1;}
+    .campo.check{flex-direction:row; align-items:center; gap:8px;}
+    .campo.check input{width:auto;}
     label{font-size:12px; color:var(--cinza); margin-bottom:5px; font-weight:700;}
-    input,select,textarea{padding:10px 12px; border:1px solid var(--line); border-radius:10px;
-      font-size:14px; width:100%; background:var(--surface2); color:var(--tinta);}
+    .campo.check label{margin:0; cursor:pointer;}
+    input,select,textarea{padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:14px; width:100%; background:var(--surface2); color:var(--tinta);}
     input:focus,select:focus,textarea:focus{outline:none; border-color:var(--azul);}
     .rodape{display:flex; justify-content:flex-end; gap:10px; margin-top:20px; flex-wrap:wrap;}
     .msg{padding:10px 12px; border-radius:10px; font-size:13px; margin-top:12px; display:none;}
@@ -116,7 +94,6 @@
     .msg.ok{background:rgba(34,197,94,.15); color:var(--verde); display:block;}
     .msg.info{background:rgba(47,111,214,.15); color:#8fb6ff; display:block;}
 
-    /* ===== MOBILE ===== */
     @media (max-width:860px){
       .sidebar{position:fixed; left:-240px; z-index:200; transition:left .25s; box-shadow:0 0 40px rgba(0,0,0,.5);}
       .sidebar.aberto{left:0;}
@@ -127,26 +104,54 @@
     @media (max-width:420px){ .cards{grid-template-columns:1fr;} }
     .backdrop{display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:150;}
     .backdrop.aberto{display:block;}
+
+    /* ===== LOGIN ===== */
+    body:not(.logado) .sidebar, body:not(.logado) .main{display:none;}
+    body.logado #login{display:none;}
+    #login{position:fixed; inset:0; z-index:500; display:flex; align-items:center; justify-content:center; padding:16px;
+      background:linear-gradient(135deg,#1c4587,#0b3d91);}
+    #login .box{background:var(--surface); border:1px solid var(--line); border-radius:18px; width:100%; max-width:380px; padding:32px 28px;}
+    #login .logoBig{width:60px; height:60px; border-radius:50%; background:var(--azul2); color:#fff; font-weight:800; font-size:22px; display:flex; align-items:center; justify-content:center; margin:0 auto 14px;}
+    #login h2{text-align:center; font-size:19px; margin-bottom:2px;}
+    #login .sub{text-align:center; color:var(--cinza); font-size:13px; margin-bottom:22px;}
+    #login label{display:block; margin:12px 0 5px;}
+    #login button{width:100%; margin-top:20px;}
+    .navItem.sair{margin-top:auto; color:#fda4af;}
+    .navItem.sair:hover{background:rgba(248,113,113,.12);}
   </style>
 </head>
 <body>
 
-  <!-- ===================== MENU LATERAL ===================== -->
+  <!-- ===================== LOGIN ===================== -->
+  <div id="login">
+    <div class="box">
+      <div class="logoBig">AD</div>
+      <h2>Sistema de Gestão</h2>
+      <div class="sub">Assembleia de Deus Nova Geração</div>
+      <label>E-mail</label>
+      <input type="email" id="lg_email" autocomplete="username">
+      <label>Senha</label>
+      <input type="password" id="lg_senha" autocomplete="current-password">
+      <button class="btn" id="lg_btn">Entrar</button>
+      <div class="msg" id="lg_msg"></div>
+    </div>
+  </div>
+
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="logo">AD</div>
       <div><div class="nome">Assembleia de Deus</div><div class="sig">Nova Geração - ADEC</div></div>
     </div>
     <div class="navItem ativo" data-tela="membros"><span class="ic">👥</span> Membros</div>
-    <div class="navItem" data-soon><span class="ic">🙋</span> Visitantes <span class="soon">em breve</span></div>
-    <div class="navItem" data-soon><span class="ic">💰</span> Financeiro <span class="soon">em breve</span></div>
-    <div class="navItem" data-soon><span class="ic">📅</span> Escalas <span class="soon">em breve</span></div>
-    <div class="navItem" data-soon><span class="ic">📖</span> EBD <span class="soon">em breve</span></div>
+    <div class="navItem" data-tela="visitantes"><span class="ic">🙋</span> Visitantes</div>
+    <div class="navItem" data-tela="financeiro"><span class="ic">💰</span> Financeiro</div>
+    <div class="navItem" data-tela="escalas"><span class="ic">📅</span> Escalas</div>
+    <div class="navItem" data-tela="ebd"><span class="ic">📖</span> EBD</div>
     <div class="navItem" data-soon><span class="ic">📊</span> Relatórios <span class="soon">em breve</span></div>
+    <div class="navItem sair" id="navSair"><span class="ic">🚪</span> Sair</div>
   </aside>
   <div class="backdrop" id="backdrop"></div>
 
-  <!-- ===================== CONTEUDO ===================== -->
   <div class="main">
     <div class="topbar">
       <button class="hamb" id="hamb">☰</button>
@@ -155,27 +160,97 @@
 
     <div class="content">
       <div class="cfgAviso" id="cfgAviso" style="display:none;">
-        ⚠️ <b>Falta configurar a conexão.</b> Abra este arquivo num editor de texto e, lá no topo do
-        código, preencha <code>SUPABASE_URL</code> e <code>SUPABASE_ANON_KEY</code> com os dados do seu
-        projeto (Supabase → Settings → API). Depois salve e recarregue a página.
+        ⚠️ <b>Falta configurar a conexão.</b> Preencha <code>SUPABASE_URL</code> e
+        <code>SUPABASE_ANON_KEY</code> no topo do código.
       </div>
 
-      <!-- Cards de estatística -->
-      <div class="cards" id="mCards"></div>
+      <!-- ===================== TELA: MEMBROS ===================== -->
+      <section class="screen ativa" data-screen="membros">
+        <div class="cards" id="mCards"></div>
+        <div class="barra">
+          <input class="busca" id="mBusca" placeholder="Buscar por nome...">
+          <button class="btn" id="mBtnNovo">+ Novo membro</button>
+        </div>
+        <div class="tableWrap">
+          <table>
+            <thead><tr><th>Nome</th><th>Idade</th><th>Cidade</th><th>Cargo</th><th></th></tr></thead>
+            <tbody id="mLista"><tr><td colspan="5" class="vazio">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
 
-      <!-- Barra -->
-      <div class="barra">
-        <input class="busca" id="mBusca" placeholder="Buscar por nome...">
-        <button class="btn" id="btnNovo">+ Novo membro</button>
-      </div>
+      <!-- ===================== TELA: VISITANTES ===================== -->
+      <section class="screen" data-screen="visitantes">
+        <div class="cards" id="vCards"></div>
+        <div class="barra">
+          <input class="busca" id="vBusca" placeholder="Buscar por nome...">
+          <button class="btn" id="vBtnNovo">+ Novo visitante</button>
+        </div>
+        <div class="tableWrap">
+          <table>
+            <thead><tr><th>Nome</th><th>Telefone</th><th>Data da visita</th><th>Como conheceu</th><th></th></tr></thead>
+            <tbody id="vLista"><tr><td colspan="5" class="vazio">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
 
-      <!-- Tabela -->
-      <div class="tableWrap">
-        <table>
-          <thead><tr><th>Nome</th><th>Idade</th><th>Cidade</th><th>Cargo</th><th></th></tr></thead>
-          <tbody id="mLista"><tr><td colspan="5" class="vazio">Carregando...</td></tr></tbody>
-        </table>
-      </div>
+      <!-- ===================== TELA: FINANCEIRO ===================== -->
+      <section class="screen" data-screen="financeiro">
+        <div class="barra">
+          <label style="color:var(--cinza); font-size:13px; align-self:center;">Competência:</label>
+          <select id="finMes" class="busca" style="flex:0 0 auto; min-width:140px;"></select>
+          <select id="finAno" class="busca" style="flex:0 0 auto; min-width:100px;"></select>
+        </div>
+        <div class="cards" id="finCards"></div>
+        <div class="subtabs">
+          <button class="subtab ativo" data-sub="dizimos">Dízimos</button>
+          <button class="subtab" data-sub="ofertas">Ofertas</button>
+          <button class="subtab" data-sub="saidas">Saídas / Contas</button>
+        </div>
+        <div class="barra" style="margin-top:12px;">
+          <div style="flex:1; color:var(--cinza); font-size:13px; align-self:center;" id="finSubInfo"></div>
+          <button class="btn" id="finBtnNovo">+ Novo</button>
+        </div>
+        <div class="tableWrap">
+          <table>
+            <thead id="finThead"></thead>
+            <tbody id="finLista"><tr><td colspan="5" class="vazio">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== TELA: ESCALAS ===================== -->
+      <section class="screen" data-screen="escalas">
+        <div class="subtabs">
+          <button class="subtab ativo" data-esc="cultos">Cultos / Eventos</button>
+          <button class="subtab" data-esc="ceia">Santa Ceia</button>
+          <button class="subtab" data-esc="departamentos">Departamentos</button>
+        </div>
+        <div class="barra" style="margin-top:12px;">
+          <div style="flex:1; color:var(--cinza); font-size:13px; align-self:center;" id="escInfo"></div>
+          <button class="btn" id="escBtnNovo">+ Novo</button>
+        </div>
+        <div class="tableWrap">
+          <table>
+            <thead id="escThead"></thead>
+            <tbody id="escLista"><tr><td colspan="6" class="vazio">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===================== TELA: EBD ===================== -->
+      <section class="screen" data-screen="ebd">
+        <div class="barra">
+          <div style="flex:1; color:var(--cinza); font-size:13px; align-self:center;" id="ebdInfo">Lições da Escola Bíblica Dominical.</div>
+          <button class="btn" id="ebdBtnNova">+ Nova lição</button>
+        </div>
+        <div class="tableWrap">
+          <table>
+            <thead><tr><th>Lição</th><th>Título</th><th>Data</th><th>Link</th><th></th></tr></thead>
+            <tbody id="ebdLista"><tr><td colspan="5" class="vazio">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </section>
     </div>
   </div>
 
@@ -186,14 +261,10 @@
       <input type="hidden" id="f_id">
       <div class="grid">
         <div class="campo full"><label>Nome completo *</label><input id="f_nome"></div>
-        <div class="campo"><label>Sexo</label>
-          <select id="f_sexo"><option value="">--</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select>
-        </div>
+        <div class="campo"><label>Sexo</label><select id="f_sexo"><option value="">--</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select></div>
         <div class="campo"><label>Cargo</label><select id="f_cargo"><option value="">Somente membro</option></select></div>
         <div class="campo"><label>Nascimento</label><input type="date" id="f_nascimento"></div>
-        <div class="campo"><label>Estado civil</label>
-          <select id="f_estado_civil"><option value="">--</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Viúvo(a)</option><option>Divorciado(a)</option><option>União estável</option></select>
-        </div>
+        <div class="campo"><label>Estado civil</label><select id="f_estado_civil"><option value="">--</option><option>Solteiro(a)</option><option>Casado(a)</option><option>Viúvo(a)</option><option>Divorciado(a)</option><option>União estável</option></select></div>
         <div class="campo"><label>CPF</label><input id="f_cpf" placeholder="somente números"></div>
         <div class="campo"><label>Telefone</label><input id="f_telefone"></div>
         <div class="campo"><label>WhatsApp</label><input id="f_whatsapp"></div>
@@ -207,17 +278,169 @@
         <div class="campo full"><label>Observações</label><textarea id="f_observacoes" rows="2"></textarea></div>
       </div>
       <div class="msg" id="mMsg"></div>
-      <div class="rodape">
-        <button class="btn sec" id="btnCancelar">Cancelar</button>
-        <button class="btn" id="btnSalvar">Salvar</button>
+      <div class="rodape"><button class="btn sec" id="mBtnCancelar">Cancelar</button><button class="btn" id="mBtnSalvar">Salvar</button></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL VISITANTE ===================== -->
+  <div class="overlay" id="vOverlay">
+    <div class="modal">
+      <h3 id="vTitulo">Novo visitante</h3>
+      <input type="hidden" id="vf_id">
+      <div class="grid">
+        <div class="campo full"><label>Nome completo *</label><input id="vf_nome"></div>
+        <div class="campo"><label>Telefone</label><input id="vf_telefone"></div>
+        <div class="campo"><label>WhatsApp</label><input id="vf_whatsapp"></div>
+        <div class="campo full"><label>E-mail</label><input id="vf_email"></div>
+        <div class="campo"><label>Data da visita</label><input type="date" id="vf_data_visita"></div>
+        <div class="campo"><label>Como conheceu</label><select id="vf_como_conheceu"><option value="">--</option><option>Convite de membro</option><option>Rede social</option><option>Passou em frente</option><option>Evento</option><option>Outros</option></select></div>
+        <div class="campo"><label>Bairro</label><input id="vf_bairro"></div>
+        <div class="campo"><label>Cidade</label><input id="vf_cidade"></div>
+        <div class="campo full check"><input type="checkbox" id="vf_deseja_visita"><label for="vf_deseja_visita">Deseja receber uma visita pastoral?</label></div>
+        <div class="campo full"><label>Observações</label><textarea id="vf_observacoes" rows="2"></textarea></div>
       </div>
+      <div class="msg" id="vMsg"></div>
+      <div class="rodape"><button class="btn sec" id="vBtnCancelar">Cancelar</button><button class="btn" id="vBtnSalvar">Salvar</button></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL DÍZIMO ===================== -->
+  <div class="overlay" id="dzOverlay">
+    <div class="modal">
+      <h3>Registrar dízimo</h3>
+      <div class="grid">
+        <div class="campo full"><label>Membro dizimista *</label><select id="dz_membro"></select></div>
+        <div class="campo"><label>Valor (R$) *</label><input type="number" step="0.01" id="dz_valor"></div>
+        <div class="campo"><label>Data</label><input type="date" id="dz_data"></div>
+        <div class="campo full"><label>Forma de pagamento</label><select id="dz_forma"><option>PIX</option><option>Dinheiro</option><option>Cartão</option><option>Transferência</option></select></div>
+        <div class="campo full"><label>Observações</label><input id="dz_obs"></div>
+      </div>
+      <div class="msg" id="dzMsg"></div>
+      <div class="rodape"><button class="btn sec" id="dzBtnCancelar">Cancelar</button><button class="btn" id="dzBtnSalvar">Salvar</button></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL OFERTA ===================== -->
+  <div class="overlay" id="ofOverlay">
+    <div class="modal">
+      <h3>Registrar oferta</h3>
+      <div class="grid">
+        <div class="campo"><label>Valor (R$) *</label><input type="number" step="0.01" id="of_valor"></div>
+        <div class="campo"><label>Data</label><input type="date" id="of_data"></div>
+        <div class="campo"><label>Tipo</label><select id="of_tipo"><option>Culto</option><option>Gratidão</option><option>Missões</option><option>Campanha</option><option>Outra</option></select></div>
+        <div class="campo"><label>Forma de pagamento</label><select id="of_forma"><option>Dinheiro</option><option>PIX</option><option>Cartão</option><option>Transferência</option></select></div>
+        <div class="campo full"><label>Observações</label><input id="of_obs"></div>
+      </div>
+      <div class="msg" id="ofMsg"></div>
+      <div class="rodape"><button class="btn sec" id="ofBtnCancelar">Cancelar</button><button class="btn" id="ofBtnSalvar">Salvar</button></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL SAÍDA ===================== -->
+  <div class="overlay" id="saOverlay">
+    <div class="modal">
+      <h3 id="saTitulo">Nova saída / conta</h3>
+      <input type="hidden" id="sa_id">
+      <div class="grid">
+        <div class="campo full"><label>Descrição *</label><input id="sa_descricao" placeholder="Ex.: Conta de luz"></div>
+        <div class="campo"><label>Valor (R$) *</label><input type="number" step="0.01" id="sa_valor"></div>
+        <div class="campo"><label>Categoria</label><select id="sa_categoria"></select></div>
+        <div class="campo"><label>Vencimento</label><input type="date" id="sa_vencimento"></div>
+        <div class="campo"><label>Forma de pagamento</label><select id="sa_forma"><option>Boleto</option><option>PIX</option><option>Dinheiro</option><option>Cartão</option><option>Transferência</option></select></div>
+        <div class="campo full check"><input type="checkbox" id="sa_pago"><label for="sa_pago">Já está paga?</label></div>
+        <div class="campo full"><label>Observações</label><input id="sa_obs"></div>
+      </div>
+      <div class="msg" id="saMsg"></div>
+      <div class="rodape"><button class="btn sec" id="saBtnCancelar">Cancelar</button><button class="btn" id="saBtnSalvar">Salvar</button></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL ESCALA (culto / ceia) ===================== -->
+  <div class="overlay" id="esOverlay">
+    <div class="modal">
+      <h3 id="esTitulo">Nova escala</h3>
+      <input type="hidden" id="es_id"><input type="hidden" id="es_tipo">
+      <div class="grid">
+        <div class="campo full"><label>Nome do culto / evento *</label><input id="es_nome" placeholder="Ex.: Culto de Domingo"></div>
+        <div class="campo"><label>Data *</label><input type="date" id="es_data"></div>
+        <div class="campo"><label>Observações</label><input id="es_obs"></div>
+        <!-- culto geral -->
+        <div class="campo es-geral"><label>Portaria</label><select id="es_portaria" class="selMembro"></select></div>
+        <div class="campo es-geral"><label>Oferta</label><select id="es_oferta" class="selMembro"></select></div>
+        <div class="campo es-geral full"><label>Palavra introdutória</label><select id="es_palavra_introducao" class="selMembro"></select></div>
+        <!-- santa ceia -->
+        <div class="campo es-ceia"><label>Preparo</label><select id="es_preparo" class="selMembro"></select></div>
+        <div class="campo es-ceia"><label>Servir pão</label><select id="es_servir_pao" class="selMembro"></select></div>
+        <div class="campo es-ceia"><label>Servir vinho</label><select id="es_servir_vinho" class="selMembro"></select></div>
+        <div class="campo es-ceia"><label>Servir uva</label><select id="es_servir_uva" class="selMembro"></select></div>
+        <div class="campo es-ceia"><label>Descarte</label><select id="es_descarte" class="selMembro"></select></div>
+      </div>
+      <div class="msg" id="esMsg"></div>
+      <div class="rodape"><button class="btn sec" id="esBtnCancelar">Cancelar</button><button class="btn" id="esBtnSalvar">Salvar</button></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL DEPARTAMENTO ===================== -->
+  <div class="overlay" id="depOverlay">
+    <div class="modal">
+      <h3 id="depTitulo">Novo departamento</h3>
+      <input type="hidden" id="dep_id">
+      <div class="grid">
+        <div class="campo full"><label>Nome *</label><input id="dep_nome" placeholder="Ex.: Diaconato / Louvor"></div>
+        <div class="campo full"><label>Líder</label><select id="dep_lider"></select></div>
+        <div class="campo full"><label>Descrição</label><input id="dep_descricao"></div>
+      </div>
+      <div class="msg" id="depMsg"></div>
+      <div class="rodape"><button class="btn sec" id="depBtnCancelar">Cancelar</button><button class="btn" id="depBtnSalvar">Salvar</button></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL PARTICIPANTES ===================== -->
+  <div class="overlay" id="partOverlay">
+    <div class="modal">
+      <h3 id="partTitulo">Participantes</h3>
+      <div id="partLista" style="margin-bottom:14px;"></div>
+      <div class="grid">
+        <div class="campo"><label>Membro</label><select id="part_membro"></select></div>
+        <div class="campo"><label>Função</label><input id="part_funcao" placeholder="Ex.: músico, levita..."></div>
+      </div>
+      <div class="rodape">
+        <button class="btn sec" id="partBtnFechar">Fechar</button>
+        <button class="btn" id="partBtnAdd">+ Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL LIÇÃO EBD ===================== -->
+  <div class="overlay" id="licOverlay">
+    <div class="modal">
+      <h3 id="licTitulo">Nova lição</h3>
+      <input type="hidden" id="lic_id">
+      <div class="grid">
+        <div class="campo"><label>Número da lição</label><input id="lic_licao" placeholder="Ex.: 10"></div>
+        <div class="campo"><label>Data (domingo) *</label><input type="date" id="lic_data"></div>
+        <div class="campo full"><label>Título *</label><input id="lic_titulo"></div>
+        <div class="campo full"><label>Link da lição</label><input id="lic_link" placeholder="https://..."></div>
+        <div class="campo full"><label>Descrição</label><textarea id="lic_descricao" rows="2"></textarea></div>
+      </div>
+      <div class="msg" id="licMsg"></div>
+      <div class="rodape"><button class="btn sec" id="licBtnCancelar">Cancelar</button><button class="btn" id="licBtnSalvar">Salvar</button></div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL CHAMADA EBD ===================== -->
+  <div class="overlay" id="chOverlay">
+    <div class="modal">
+      <h3 id="chTitulo">Chamada</h3>
+      <div id="chResumo" style="color:var(--cinza); font-size:13px; margin-bottom:12px;"></div>
+      <div id="chLista" style="max-height:50vh; overflow-y:auto;"></div>
+      <div class="rodape"><button class="btn sec" id="chBtnFechar">Fechar</button></div>
     </div>
   </div>
 
   <script>
   /* ========================================================================
-     CONFIGURAÇÃO - preencha com os dados do seu projeto Supabase
-     (Supabase → Settings → API). A anon key pode ficar aqui (é pública).
+     CONFIGURAÇÃO do Supabase (anon/publishable key pode ficar aqui).
      ======================================================================== */
   const SUPABASE_URL      = 'https://xbvqnasxdupkijyggckx.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_-AcAcxBmyQhTt5OPwuYqLQ_MQRjMZxR';
@@ -227,193 +450,635 @@
   let sb = null;
   if (configOK) sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  /* ---------- helpers ---------- */
   const $ = id => document.getElementById(id);
   const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  function idade(nasc){
-    if(!nasc) return '';
-    const d = new Date(nasc); if(isNaN(d)) return '';
-    const h = new Date(); let a = h.getFullYear()-d.getFullYear();
-    const passou = h.getMonth()>d.getMonth() || (h.getMonth()===d.getMonth() && h.getDate()>=d.getDate());
-    return passou ? a : a-1;
-  }
-  function soDigitos(v){ return String(v||'').replace(/\D/g,''); }
+  const soDigitos = v => String(v||'').replace(/\D/g,'');
+  function idade(nasc){ if(!nasc) return ''; const d=new Date(nasc); if(isNaN(d)) return ''; const h=new Date(); let a=h.getFullYear()-d.getFullYear(); const p=h.getMonth()>d.getMonth()||(h.getMonth()===d.getMonth()&&h.getDate()>=d.getDate()); return p?a:a-1; }
   function abreviar(nome){ const p=String(nome||'').trim().split(/\s+/); return p.length<=1?p[0]||'':p[0]+' '+p[p.length-1]; }
-
-  /* ---------- menu mobile ---------- */
-  $('hamb').onclick = () => { $('sidebar').classList.toggle('aberto'); $('backdrop').classList.toggle('aberto'); };
-  $('backdrop').onclick = () => { $('sidebar').classList.remove('aberto'); $('backdrop').classList.remove('aberto'); };
-  document.querySelectorAll('[data-soon]').forEach(el => el.onclick = () => alert('Esse módulo entra nas próximas etapas. 🙂'));
-
-  /* ---------- estado ---------- */
-  let cargos = [];          // lista de cargos ativos
-  let membros = [];         // membros ativos carregados
-
-  /* ======================================================================
-     CARGA INICIAL
-     ====================================================================== */
-  async function iniciar(){
-    if(!configOK){ $('cfgAviso').style.display='block'; $('mLista').innerHTML='<tr><td colspan="5" class="vazio">Configure a conexão para carregar os membros.</td></tr>'; $('mCards').innerHTML=''; return; }
-    await carregarCargos();
-    await carregarMembros();
-  }
-
-  async function carregarCargos(){
-    const { data, error } = await sb.from('cargos').select('id,nome').eq('situacao','ativo').order('ordem');
-    if(error){ console.error(error); return; }
-    cargos = data || [];
-    const sel = $('f_cargo');
-    sel.innerHTML = '<option value="">Somente membro</option>' + cargos.map(c => `<option value="${c.id}">${esc(c.nome)}</option>`).join('');
-  }
-
-  async function carregarMembros(){
-    const { data, error } = await sb
-      .from('membros')
-      .select('*, membros_cargos(cargo_id, situacao, cargos(nome))')
-      .eq('situacao','ativo')
-      .order('nome');
-    if(error){ erroTabela(error.message); return; }
-    membros = data || [];
-    render(membros);
-    renderCards(membros);
-  }
-
-  function cargoDoMembro(m){
-    const link = (m.membros_cargos||[]).find(x => x.situacao==='ativo');
-    return link && link.cargos ? link.cargos.nome : '';
-  }
-
-  function render(lista){
-    const tb = $('mLista');
-    if(!lista.length){ tb.innerHTML='<tr><td colspan="5" class="vazio">Nenhum membro encontrado.</td></tr>'; return; }
-    tb.innerHTML = lista.map(m => {
-      const cg = cargoDoMembro(m);
-      return `<tr>
-        <td>${esc(abreviar(m.nome))}</td>
-        <td>${idade(m.nascimento)!==''?idade(m.nascimento):''}</td>
-        <td>${esc(m.cidade||'')}</td>
-        <td>${cg?`<span class="cargoTag">${esc(cg)}</span>`:''}</td>
-        <td>
-          <span class="acao" data-edit="${m.id}">Editar</span>
-          <span class="acao del" data-del="${m.id}" data-nome="${esc(m.nome)}">Inativar</span>
-        </td></tr>`;
-    }).join('');
-    tb.querySelectorAll('[data-edit]').forEach(el => el.onclick = () => abrirEditar(el.dataset.edit));
-    tb.querySelectorAll('[data-del]').forEach(el => el.onclick = () => inativar(el.dataset.del, el.dataset.nome));
-  }
-
-  function renderCards(lista){
-    const total = lista.length;
-    const h = lista.filter(m=>m.sexo==='masculino').length;
-    const mu = lista.filter(m=>m.sexo==='feminino').length;
-    const bat = lista.filter(m=>m.ano_batismo).length;
-    const mesAtual = new Date().getMonth();
-    const aniv = lista.filter(m=>m.nascimento && new Date(m.nascimento).getMonth()===mesAtual).length;
-    $('mCards').innerHTML =
-      card(total,'Ativos')+card(h,'Homens')+card(mu,'Mulheres')+card(bat,'Batizados')+card(aniv,'Aniversariantes/mês');
-  }
+  function fmtData(iso){ if(!iso) return ''; const m=String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/); return m?`${m[3]}/${m[2]}/${m[1]}`:iso; }
+  function fmtTel(v){ const n=soDigitos(v); if(n.length===11) return `(${n.slice(0,2)}) ${n.slice(2,7)}-${n.slice(7)}`; if(n.length===10) return `(${n.slice(0,2)}) ${n.slice(2,6)}-${n.slice(6)}`; return v||''; }
+  function fmtMoeda(v){ return 'R$ ' + (Number(v)||0).toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2}); }
   function card(n,l){ return `<div class="card"><div class="n">${n||0}</div><div class="l">${l}</div></div>`; }
 
-  function erroTabela(msg){
-    $('mLista').innerHTML = `<tr><td colspan="5" class="vazio">Erro ao carregar: ${esc(msg)}<br><br>
-      Se falar em permissão/RLS, rode o <b>03_policies_dev.sql</b> no Supabase.</td></tr>`;
+  /* ---------- navegacao entre telas ---------- */
+  const titulos = { membros:'Membros', visitantes:'Visitantes', financeiro:'Financeiro', escalas:'Escalas e Departamentos', ebd:'Escola Bíblica Dominical' };
+  const jaCarregou = {};
+  function irPara(tela){
+    document.querySelectorAll('.navItem').forEach(n => n.classList.toggle('ativo', n.dataset.tela===tela));
+    document.querySelectorAll('.screen').forEach(s => s.classList.toggle('ativa', s.dataset.screen===tela));
+    $('tituloTela').textContent = titulos[tela] || tela;
+    $('sidebar').classList.remove('aberto'); $('backdrop').classList.remove('aberto');
+    if(configOK && !jaCarregou[tela]){ jaCarregou[tela]=true;
+      if(tela==='membros') Membros.carregar();
+      if(tela==='visitantes') Visitantes.carregar();
+      if(tela==='financeiro') Financeiro.iniciar();
+      if(tela==='escalas') Escalas.iniciar();
+      if(tela==='ebd') EBD.iniciar();
+    }
   }
+  document.querySelectorAll('[data-tela]').forEach(el => el.onclick = () => irPara(el.dataset.tela));
+  document.querySelectorAll('[data-soon]').forEach(el => el.onclick = () => alert('Esse módulo entra nas próximas etapas. 🙂'));
+  $('hamb').onclick = () => { $('sidebar').classList.toggle('aberto'); $('backdrop').classList.toggle('aberto'); };
+  $('backdrop').onclick = () => { $('sidebar').classList.remove('aberto'); $('backdrop').classList.remove('aberto'); };
 
-  /* ======================================================================
-     BUSCA
-     ====================================================================== */
-  $('mBusca').oninput = () => {
-    const t = $('mBusca').value.trim().toLowerCase();
-    if(!t){ render(membros); return; }
-    render(membros.filter(m => String(m.nome||'').toLowerCase().includes(t)));
+  /* ========================================================================
+     MÓDULO MEMBROS
+     ======================================================================== */
+  const Membros = {
+    cargos: [], lista: [],
+    campos: ['nome','sexo','cargo','nascimento','estado_civil','cpf','telefone','whatsapp','email','endereco','bairro','cidade','ano_batismo','membro_desde','profissao','observacoes'],
+
+    async carregar(){
+      await Membros.carregarCargos();
+      const { data, error } = await sb.from('membros')
+        .select('*, membros_cargos(cargo_id, situacao, cargos(nome))')
+        .eq('situacao','ativo').order('nome');
+      if(error){ $('mLista').innerHTML=`<tr><td colspan="5" class="vazio">Erro: ${esc(error.message)}<br>Se for permissão/RLS, rode o 03_policies_dev.sql.</td></tr>`; return; }
+      Membros.lista = data||[];
+      Membros.render(Membros.lista); Membros.renderCards(Membros.lista);
+    },
+    async carregarCargos(){
+      const { data } = await sb.from('cargos').select('id,nome').eq('situacao','ativo').order('ordem');
+      Membros.cargos = data||[];
+      $('f_cargo').innerHTML = '<option value="">Somente membro</option>' + Membros.cargos.map(c=>`<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+    },
+    cargoDe(m){ const l=(m.membros_cargos||[]).find(x=>x.situacao==='ativo'); return l&&l.cargos?l.cargos.nome:''; },
+    render(lista){
+      const tb=$('mLista');
+      if(!lista.length){ tb.innerHTML='<tr><td colspan="5" class="vazio">Nenhum membro encontrado.</td></tr>'; return; }
+      tb.innerHTML = lista.map(m=>{ const cg=Membros.cargoDe(m);
+        return `<tr><td>${esc(abreviar(m.nome))}</td><td>${idade(m.nascimento)!==''?idade(m.nascimento):''}</td>
+          <td>${esc(m.cidade||'')}</td><td>${cg?`<span class="cargoTag">${esc(cg)}</span>`:''}</td>
+          <td><span class="acao" data-edit="${m.id}">Editar</span><span class="acao del" data-del="${m.id}" data-nome="${esc(m.nome)}">Inativar</span></td></tr>`;
+      }).join('');
+      tb.querySelectorAll('[data-edit]').forEach(el=>el.onclick=()=>Membros.abrirEditar(el.dataset.edit));
+      tb.querySelectorAll('[data-del]').forEach(el=>el.onclick=()=>Membros.inativar(el.dataset.del, el.dataset.nome));
+    },
+    renderCards(lista){
+      const mes=new Date().getMonth();
+      $('mCards').innerHTML = card(lista.length,'Ativos')
+        + card(lista.filter(m=>m.sexo==='masculino').length,'Homens')
+        + card(lista.filter(m=>m.sexo==='feminino').length,'Mulheres')
+        + card(lista.filter(m=>m.ano_batismo).length,'Batizados')
+        + card(lista.filter(m=>m.nascimento && new Date(m.nascimento).getMonth()===mes).length,'Aniversariantes/mês');
+    },
+    limpar(){ $('f_id').value=''; Membros.campos.forEach(c=>{const el=$('f_'+c); if(el) el.value='';}); $('mMsg').className='msg'; },
+    abrirEditar(id){
+      const m=Membros.lista.find(x=>x.id===id); if(!m) return;
+      Membros.limpar(); $('mTitulo').textContent='Editar membro'; $('f_id').value=m.id;
+      ['nome','nascimento','cpf','telefone','whatsapp','email','endereco','bairro','cidade','ano_batismo','membro_desde','profissao','observacoes'].forEach(c=>{const el=$('f_'+c); if(el) el.value=m[c]==null?'':m[c];});
+      $('f_sexo').value=m.sexo||''; $('f_estado_civil').value=m.estado_civil||'';
+      const l=(m.membros_cargos||[]).find(x=>x.situacao==='ativo'); $('f_cargo').value=l?l.cargo_id:'';
+      $('mOverlay').classList.add('aberto');
+    },
+    async salvar(){
+      const msg=$('mMsg'); const nome=$('f_nome').value.trim();
+      if(!nome){ msg.className='msg erro'; msg.textContent='O nome é obrigatório.'; return; }
+      const dados={ nome, sexo:$('f_sexo').value||null, nascimento:$('f_nascimento').value||null, estado_civil:$('f_estado_civil').value||null,
+        cpf:soDigitos($('f_cpf').value)||null, telefone:soDigitos($('f_telefone').value)||null, whatsapp:soDigitos($('f_whatsapp').value)||null,
+        email:$('f_email').value.trim().toLowerCase()||null, endereco:$('f_endereco').value.trim()||null, bairro:$('f_bairro').value.trim()||null,
+        cidade:$('f_cidade').value.trim()||null, ano_batismo:$('f_ano_batismo').value?Number($('f_ano_batismo').value):null,
+        membro_desde:$('f_membro_desde').value?Number($('f_membro_desde').value):null, profissao:$('f_profissao').value.trim()||null, observacoes:$('f_observacoes').value.trim()||null };
+      $('mBtnSalvar').disabled=true; msg.className='msg info'; msg.textContent='Salvando...';
+      try{
+        const id=$('f_id').value; let membroId=id;
+        if(id){ const {error}=await sb.from('membros').update(dados).eq('id',id); if(error) throw error; }
+        else { const {data,error}=await sb.from('membros').insert(dados).select('id').single(); if(error) throw error; membroId=data.id; }
+        await sb.from('membros_cargos').delete().eq('membro_id',membroId);
+        const cargoId=$('f_cargo').value;
+        if(cargoId) await sb.from('membros_cargos').insert({membro_id:membroId, cargo_id:cargoId, situacao:'ativo'});
+        msg.className='msg ok'; msg.textContent='Salvo!'; await Membros.carregar();
+        setTimeout(()=>$('mOverlay').classList.remove('aberto'),600);
+      }catch(e){ msg.className='msg erro'; msg.textContent='Erro: '+(e.message||e); }
+      finally{ $('mBtnSalvar').disabled=false; }
+    },
+    async inativar(id,nome){ if(!confirm(`Inativar o membro "${nome}"?`)) return;
+      const {error}=await sb.from('membros').update({situacao:'inativo'}).eq('id',id);
+      if(error){ alert('Erro: '+error.message); return; } await Membros.carregar(); }
   };
+  $('mBtnNovo').onclick=()=>{ Membros.limpar(); $('mTitulo').textContent='Novo membro'; $('mOverlay').classList.add('aberto'); };
+  $('mBtnCancelar').onclick=()=>$('mOverlay').classList.remove('aberto');
+  $('mBtnSalvar').onclick=()=>Membros.salvar();
+  $('mBusca').oninput=()=>{ const t=$('mBusca').value.trim().toLowerCase(); Membros.render(!t?Membros.lista:Membros.lista.filter(m=>String(m.nome||'').toLowerCase().includes(t))); };
 
-  /* ======================================================================
-     MODAL (novo / editar)
-     ====================================================================== */
-  const campos = ['nome','sexo','cargo','nascimento','estado_civil','cpf','telefone','whatsapp','email','endereco','bairro','cidade','ano_batismo','membro_desde','profissao','observacoes'];
+  /* ========================================================================
+     MÓDULO VISITANTES
+     ======================================================================== */
+  const Visitantes = {
+    lista: [],
+    campos: ['nome','telefone','whatsapp','email','data_visita','como_conheceu','bairro','cidade','observacoes'],
 
-  function limparForm(){ $('f_id').value=''; campos.forEach(c => { const el=$('f_'+c); if(el) el.value=''; }); $('mMsg').className='msg'; }
-
-  $('btnNovo').onclick = () => { limparForm(); $('mTitulo').textContent='Novo membro'; $('mOverlay').classList.add('aberto'); };
-  $('btnCancelar').onclick = () => $('mOverlay').classList.remove('aberto');
-
-  function abrirEditar(id){
-    const m = membros.find(x => x.id===id); if(!m) return;
-    limparForm();
-    $('mTitulo').textContent='Editar membro';
-    $('f_id').value = m.id;
-    ['nome','nascimento','cpf','telefone','whatsapp','email','endereco','bairro','cidade','ano_batismo','membro_desde','profissao','observacoes']
-      .forEach(c => { const el=$('f_'+c); if(el) el.value = m[c]==null?'':m[c]; });
-    $('f_sexo').value = m.sexo||'';
-    $('f_estado_civil').value = m.estado_civil||'';
-    const link = (m.membros_cargos||[]).find(x=>x.situacao==='ativo');
-    $('f_cargo').value = link ? link.cargo_id : '';
-    $('mOverlay').classList.add('aberto');
-  }
-
-  $('btnSalvar').onclick = async () => {
-    const msg = $('mMsg');
-    const nome = $('f_nome').value.trim();
-    if(!nome){ msg.className='msg erro'; msg.textContent='O nome é obrigatório.'; return; }
-
-    const dados = {
-      nome,
-      sexo: $('f_sexo').value || null,
-      nascimento: $('f_nascimento').value || null,
-      estado_civil: $('f_estado_civil').value || null,
-      cpf: soDigitos($('f_cpf').value) || null,
-      telefone: soDigitos($('f_telefone').value) || null,
-      whatsapp: soDigitos($('f_whatsapp').value) || null,
-      email: $('f_email').value.trim().toLowerCase() || null,
-      endereco: $('f_endereco').value.trim() || null,
-      bairro: $('f_bairro').value.trim() || null,
-      cidade: $('f_cidade').value.trim() || null,
-      ano_batismo: $('f_ano_batismo').value ? Number($('f_ano_batismo').value) : null,
-      membro_desde: $('f_membro_desde').value ? Number($('f_membro_desde').value) : null,
-      profissao: $('f_profissao').value.trim() || null,
-      observacoes: $('f_observacoes').value.trim() || null
-    };
-
-    $('btnSalvar').disabled = true;
-    msg.className='msg info'; msg.textContent='Salvando...';
-
-    try{
-      const id = $('f_id').value;
-      let membroId = id;
-      if(id){
-        const { error } = await sb.from('membros').update(dados).eq('id', id);
-        if(error) throw error;
-      } else {
-        const { data, error } = await sb.from('membros').insert(dados).select('id').single();
-        if(error) throw error;
-        membroId = data.id;
-      }
-      // sincroniza cargo (link em membros_cargos)
-      await sb.from('membros_cargos').delete().eq('membro_id', membroId);
-      const cargoId = $('f_cargo').value;
-      if(cargoId){
-        await sb.from('membros_cargos').insert({ membro_id: membroId, cargo_id: cargoId, situacao:'ativo' });
-      }
-      msg.className='msg ok'; msg.textContent='Salvo!';
-      await carregarMembros();
-      setTimeout(() => $('mOverlay').classList.remove('aberto'), 600);
-    }catch(e){
-      msg.className='msg erro'; msg.textContent='Erro: ' + (e.message||e);
-    }finally{
-      $('btnSalvar').disabled = false;
+    async carregar(){
+      const { data, error } = await sb.from('visitantes').select('*').eq('situacao','ativo').order('data_visita',{ascending:false});
+      if(error){ $('vLista').innerHTML=`<tr><td colspan="5" class="vazio">Erro: ${esc(error.message)}</td></tr>`; return; }
+      Visitantes.lista = data||[];
+      Visitantes.render(Visitantes.lista); Visitantes.renderCards(Visitantes.lista);
+    },
+    render(lista){
+      const tb=$('vLista');
+      if(!lista.length){ tb.innerHTML='<tr><td colspan="5" class="vazio">Nenhum visitante cadastrado.</td></tr>'; return; }
+      tb.innerHTML = lista.map(v=>`<tr>
+        <td>${esc(v.nome)}${v.deseja_visita?' ⭐':''}</td>
+        <td>${esc(fmtTel(v.telefone))}</td>
+        <td>${esc(fmtData(v.data_visita))}</td>
+        <td>${esc(v.como_conheceu||'')}</td>
+        <td><span class="acao" data-edit="${v.id}">Editar</span>
+          <span class="acao conv" data-conv="${v.id}" data-nome="${esc(v.nome)}">➜ Virar membro</span>
+          <span class="acao del" data-del="${v.id}" data-nome="${esc(v.nome)}">Inativar</span></td></tr>`).join('');
+      tb.querySelectorAll('[data-edit]').forEach(el=>el.onclick=()=>Visitantes.abrirEditar(el.dataset.edit));
+      tb.querySelectorAll('[data-conv]').forEach(el=>el.onclick=()=>Visitantes.converter(el.dataset.conv, el.dataset.nome));
+      tb.querySelectorAll('[data-del]').forEach(el=>el.onclick=()=>Visitantes.inativar(el.dataset.del, el.dataset.nome));
+    },
+    renderCards(lista){
+      const mes=new Date().getMonth();
+      $('vCards').innerHTML = card(lista.length,'Total de visitantes')
+        + card(lista.filter(v=>v.data_visita && new Date(v.data_visita).getMonth()===mes).length,'Visitantes este mês')
+        + card(lista.filter(v=>v.deseja_visita).length,'Querem visita');
+    },
+    limpar(){ $('vf_id').value=''; Visitantes.campos.forEach(c=>{const el=$('vf_'+c); if(el) el.value='';}); $('vf_deseja_visita').checked=false; $('vMsg').className='msg'; },
+    abrirEditar(id){
+      const v=Visitantes.lista.find(x=>x.id===id); if(!v) return;
+      Visitantes.limpar(); $('vTitulo').textContent='Editar visitante'; $('vf_id').value=v.id;
+      Visitantes.campos.forEach(c=>{const el=$('vf_'+c); if(el) el.value=v[c]==null?'':v[c];});
+      $('vf_deseja_visita').checked=!!v.deseja_visita;
+      $('vOverlay').classList.add('aberto');
+    },
+    async salvar(){
+      const msg=$('vMsg'); const nome=$('vf_nome').value.trim();
+      if(!nome){ msg.className='msg erro'; msg.textContent='O nome é obrigatório.'; return; }
+      const dados={ nome, telefone:soDigitos($('vf_telefone').value)||null, whatsapp:soDigitos($('vf_whatsapp').value)||null,
+        email:$('vf_email').value.trim().toLowerCase()||null, data_visita:$('vf_data_visita').value||null,
+        como_conheceu:$('vf_como_conheceu').value||null, bairro:$('vf_bairro').value.trim()||null, cidade:$('vf_cidade').value.trim()||null,
+        deseja_visita:$('vf_deseja_visita').checked, observacoes:$('vf_observacoes').value.trim()||null };
+      $('vBtnSalvar').disabled=true; msg.className='msg info'; msg.textContent='Salvando...';
+      try{
+        const id=$('vf_id').value;
+        if(id){ const {error}=await sb.from('visitantes').update(dados).eq('id',id); if(error) throw error; }
+        else { const {error}=await sb.from('visitantes').insert(dados); if(error) throw error; }
+        msg.className='msg ok'; msg.textContent='Salvo!'; await Visitantes.carregar();
+        setTimeout(()=>$('vOverlay').classList.remove('aberto'),600);
+      }catch(e){ msg.className='msg erro'; msg.textContent='Erro: '+(e.message||e); }
+      finally{ $('vBtnSalvar').disabled=false; }
+    },
+    async inativar(id,nome){ if(!confirm(`Inativar o visitante "${nome}"?`)) return;
+      const {error}=await sb.from('visitantes').update({situacao:'inativo'}).eq('id',id);
+      if(error){ alert('Erro: '+error.message); return; } await Visitantes.carregar(); },
+    async converter(id,nome){
+      if(!confirm(`Transformar "${nome}" em membro? Ele vai pro cadastro de membros e sai da lista de visitantes.`)) return;
+      const v=Visitantes.lista.find(x=>x.id===id); if(!v) return;
+      try{
+        const {error:e1}=await sb.from('membros').insert({ nome:v.nome, telefone:v.telefone, whatsapp:v.whatsapp, email:v.email,
+          bairro:v.bairro, cidade:v.cidade, observacoes:(v.observacoes?v.observacoes+' | ':'')+'Convertido de visitante' });
+        if(e1) throw e1;
+        const {error:e2}=await sb.from('visitantes').update({situacao:'inativo'}).eq('id',id); if(e2) throw e2;
+        alert('Convertido em membro! Veja na aba Membros para completar os dados.');
+        await Visitantes.carregar();
+        if(jaCarregou.membros) await Membros.carregar();
+      }catch(e){ alert('Erro na conversão: '+(e.message||e)); }
     }
   };
+  $('vBtnNovo').onclick=()=>{ Visitantes.limpar(); $('vTitulo').textContent='Novo visitante'; $('vOverlay').classList.add('aberto'); };
+  $('vBtnCancelar').onclick=()=>$('vOverlay').classList.remove('aberto');
+  $('vBtnSalvar').onclick=()=>Visitantes.salvar();
+  $('vBusca').oninput=()=>{ const t=$('vBusca').value.trim().toLowerCase(); Visitantes.render(!t?Visitantes.lista:Visitantes.lista.filter(v=>String(v.nome||'').toLowerCase().includes(t))); };
 
-  async function inativar(id, nome){
-    if(!confirm(`Inativar o membro "${nome}"?`)) return;
-    const { error } = await sb.from('membros').update({ situacao:'inativo' }).eq('id', id);
-    if(error){ alert('Erro: '+error.message); return; }
-    await carregarMembros();
+  /* ========================================================================
+     MÓDULO FINANCEIRO
+     ======================================================================== */
+  const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const Financeiro = {
+    pronto:false, membros:[], categoriasSaida:[], lancamentos:[], sub:'dizimos',
+
+    async iniciar(){
+      if(!Financeiro.pronto){
+        Financeiro.montarSelects();
+        await Financeiro.carregarApoio();
+        Financeiro.pronto=true;
+      }
+      await Financeiro.recarregar();
+    },
+    montarSelects(){
+      const hoje=new Date();
+      $('finMes').innerHTML = MESES.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+      $('finMes').value = hoje.getMonth()+1;
+      let anos=''; for(let y=hoje.getFullYear()+1; y>=hoje.getFullYear()-5; y--) anos+=`<option value="${y}">${y}</option>`;
+      $('finAno').innerHTML=anos; $('finAno').value=hoje.getFullYear();
+      $('finMes').onchange=()=>Financeiro.recarregar();
+      $('finAno').onchange=()=>Financeiro.recarregar();
+      document.querySelectorAll('.subtab').forEach(b=>b.onclick=()=>{
+        document.querySelectorAll('.subtab').forEach(x=>x.classList.toggle('ativo', x===b));
+        Financeiro.sub=b.dataset.sub; Financeiro.renderLista();
+      });
+    },
+    async carregarApoio(){
+      const {data:ms}=await sb.from('membros').select('id,nome').eq('situacao','ativo').order('nome');
+      Financeiro.membros=ms||[];
+      $('dz_membro').innerHTML='<option value="">-- Selecione --</option>'+Financeiro.membros.map(m=>`<option value="${m.id}">${esc(m.nome)}</option>`).join('');
+      const {data:cs}=await sb.from('categorias_financeiras').select('id,nome').eq('tipo','saida').eq('situacao','ativo').order('nome');
+      Financeiro.categoriasSaida=cs||[];
+      $('sa_categoria').innerHTML='<option value="">--</option>'+Financeiro.categoriasSaida.map(c=>`<option value="${c.id}">${esc(c.nome)}</option>`).join('');
+    },
+    comp(){ return $('finAno').value+'-'+String($('finMes').value).padStart(2,'0'); },
+    async recarregar(){
+      const {data,error}=await sb.from('lancamentos').select('*, membros(nome)').eq('competencia',Financeiro.comp()).eq('situacao','ativo').order('data',{ascending:false});
+      if(error){ $('finLista').innerHTML=`<tr><td colspan="5" class="vazio">Erro: ${esc(error.message)}</td></tr>`; return; }
+      Financeiro.lancamentos=data||[];
+      Financeiro.renderCards(); Financeiro.renderLista();
+    },
+    renderCards(){
+      const L=Financeiro.lancamentos;
+      const soma=f=>L.filter(f).reduce((s,x)=>s+Number(x.valor||0),0);
+      const entradas=soma(x=>x.tipo==='entrada');
+      const saidasPagas=soma(x=>x.tipo==='saida'&&x.status==='pago');
+      const dizimos=soma(x=>(x.origem||'').toUpperCase()==='DIZIMO');
+      const ofertas=soma(x=>(x.origem||'').toUpperCase()==='OFERTA');
+      $('finCards').innerHTML = card(fmtMoeda(entradas),'Entradas')
+        + card(fmtMoeda(saidasPagas),'Saídas pagas')
+        + card(fmtMoeda(entradas-saidasPagas),'Saldo do mês')
+        + card(fmtMoeda(dizimos),'Dízimos')
+        + card(fmtMoeda(ofertas),'Ofertas');
+    },
+    renderLista(){
+      const L=Financeiro.lancamentos; const th=$('finThead'); const tb=$('finLista');
+      let itens, cols;
+      if(Financeiro.sub==='dizimos'){
+        itens=L.filter(x=>(x.origem||'').toUpperCase()==='DIZIMO');
+        cols=['Data','Membro','Forma','Valor',''];
+        $('finSubInfo').textContent=`${itens.length} dízimo(s) na competência`;
+      } else if(Financeiro.sub==='ofertas'){
+        itens=L.filter(x=>(x.origem||'').toUpperCase()==='OFERTA');
+        cols=['Data','Tipo','Forma','Valor',''];
+        $('finSubInfo').textContent=`${itens.length} oferta(s) na competência`;
+      } else {
+        itens=L.filter(x=>x.tipo==='saida');
+        cols=['Vencimento','Descrição','Status','Valor',''];
+        $('finSubInfo').textContent=`${itens.length} saída(s) na competência`;
+      }
+      th.innerHTML='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+      if(!itens.length){ tb.innerHTML=`<tr><td colspan="5" class="vazio">Nada lançado aqui ainda.</td></tr>`; return; }
+      tb.innerHTML=itens.map(x=>{
+        const del=`<span class="acao del" data-del="${x.id}">Excluir</span>`;
+        if(Financeiro.sub==='dizimos') return `<tr><td>${esc(fmtData(x.data))}</td><td>${esc(x.membros?x.membros.nome:'')}</td><td>${esc(x.forma_pagamento||'')}</td><td>${fmtMoeda(x.valor)}</td><td>${del}</td></tr>`;
+        if(Financeiro.sub==='ofertas') return `<tr><td>${esc(fmtData(x.data))}</td><td>${esc(x.categoria_id||x.descricao||'')}</td><td>${esc(x.forma_pagamento||'')}</td><td>${fmtMoeda(x.valor)}</td><td>${del}</td></tr>`;
+        const stCor=x.status==='pago'?'#4ade80':'#fbbf24';
+        const stBtn=x.status!=='pago'?`<span class="acao conv" data-pagar="${x.id}">Dar baixa</span>`:'';
+        return `<tr><td>${esc(fmtData(x.data))}</td><td>${esc(x.descricao||'')}</td><td style="color:${stCor}">${x.status==='pago'?'Paga':'Pendente'}</td><td>${fmtMoeda(x.valor)}</td><td>${stBtn}${del}</td></tr>`;
+      }).join('');
+      tb.querySelectorAll('[data-del]').forEach(el=>el.onclick=()=>Financeiro.excluir(el.dataset.del));
+      tb.querySelectorAll('[data-pagar]').forEach(el=>el.onclick=()=>Financeiro.darBaixa(el.dataset.pagar));
+    },
+    novo(){
+      if(Financeiro.sub==='dizimos'){ $('dz_membro').value=''; $('dz_valor').value=''; $('dz_obs').value=''; $('dz_data').value=new Date().toISOString().slice(0,10); $('dz_forma').value='PIX'; $('dzMsg').className='msg'; $('dzOverlay').classList.add('aberto'); }
+      else if(Financeiro.sub==='ofertas'){ $('of_valor').value=''; $('of_obs').value=''; $('of_data').value=new Date().toISOString().slice(0,10); $('ofMsg').className='msg'; $('ofOverlay').classList.add('aberto'); }
+      else { $('sa_id').value=''; $('sa_descricao').value=''; $('sa_valor').value=''; $('sa_categoria').value=''; $('sa_vencimento').value=new Date().toISOString().slice(0,10); $('sa_forma').value='Boleto'; $('sa_pago').checked=false; $('sa_obs').value=''; $('saMsg').className='msg'; $('saOverlay').classList.add('aberto'); }
+    },
+    async salvarDizimo(){
+      const msg=$('dzMsg'); const membro=$('dz_membro').value; const valor=Number($('dz_valor').value);
+      if(!membro){ msg.className='msg erro'; msg.textContent='Selecione o membro.'; return; }
+      if(!valor||valor<=0){ msg.className='msg erro'; msg.textContent='Informe um valor válido.'; return; }
+      const data=$('dz_data').value||new Date().toISOString().slice(0,10);
+      $('dzBtnSalvar').disabled=true; msg.className='msg info'; msg.textContent='Salvando...';
+      const {error}=await sb.from('lancamentos').insert({ data, competencia:data.slice(0,7), tipo:'entrada', origem:'DIZIMO',
+        descricao:'Dízimo', valor, membro_id:membro, forma_pagamento:$('dz_forma').value, status:'pago', data_pagamento:data, observacoes:$('dz_obs').value.trim()||null });
+      $('dzBtnSalvar').disabled=false;
+      if(error){ msg.className='msg erro'; msg.textContent='Erro: '+error.message; return; }
+      $('dzOverlay').classList.remove('aberto'); Financeiro.irParaComp(data);
+    },
+    async salvarOferta(){
+      const msg=$('ofMsg'); const valor=Number($('of_valor').value);
+      if(!valor||valor<=0){ msg.className='msg erro'; msg.textContent='Informe um valor válido.'; return; }
+      const data=$('of_data').value||new Date().toISOString().slice(0,10);
+      $('ofBtnSalvar').disabled=true; msg.className='msg info'; msg.textContent='Salvando...';
+      const {error}=await sb.from('lancamentos').insert({ data, competencia:data.slice(0,7), tipo:'entrada', origem:'OFERTA',
+        descricao:'Oferta ('+$('of_tipo').value+')', valor, forma_pagamento:$('of_forma').value, status:'pago', data_pagamento:data, observacoes:$('of_obs').value.trim()||null });
+      $('ofBtnSalvar').disabled=false;
+      if(error){ msg.className='msg erro'; msg.textContent='Erro: '+error.message; return; }
+      $('ofOverlay').classList.remove('aberto'); Financeiro.irParaComp(data);
+    },
+    async salvarSaida(){
+      const msg=$('saMsg'); const desc=$('sa_descricao').value.trim(); const valor=Number($('sa_valor').value);
+      if(!desc){ msg.className='msg erro'; msg.textContent='Informe a descrição.'; return; }
+      if(!valor||valor<=0){ msg.className='msg erro'; msg.textContent='Informe um valor válido.'; return; }
+      const venc=$('sa_vencimento').value||new Date().toISOString().slice(0,10);
+      const pago=$('sa_pago').checked;
+      $('saBtnSalvar').disabled=true; msg.className='msg info'; msg.textContent='Salvando...';
+      const {error}=await sb.from('lancamentos').insert({ data:venc, competencia:venc.slice(0,7), tipo:'saida', origem:'SAIDA',
+        descricao:desc, valor, categoria_id:$('sa_categoria').value||null, forma_pagamento:$('sa_forma').value,
+        status:pago?'pago':'pendente', data_pagamento:pago?new Date().toISOString().slice(0,10):null, observacoes:$('sa_obs').value.trim()||null });
+      $('saBtnSalvar').disabled=false;
+      if(error){ msg.className='msg erro'; msg.textContent='Erro: '+error.message; return; }
+      $('saOverlay').classList.remove('aberto'); Financeiro.irParaComp(venc);
+    },
+    irParaComp(dataISO){ const [a,m]=dataISO.split('-'); $('finAno').value=a; $('finMes').value=Number(m); Financeiro.recarregar(); },
+    async darBaixa(id){ const {error}=await sb.from('lancamentos').update({status:'pago', data_pagamento:new Date().toISOString().slice(0,10)}).eq('id',id);
+      if(error){ alert('Erro: '+error.message); return; } Financeiro.recarregar(); },
+    async excluir(id){ if(!confirm('Excluir este lançamento?')) return;
+      const {error}=await sb.from('lancamentos').update({situacao:'inativo'}).eq('id',id);
+      if(error){ alert('Erro: '+error.message); return; } Financeiro.recarregar(); }
+  };
+  $('finBtnNovo').onclick=()=>Financeiro.novo();
+  $('dzBtnCancelar').onclick=()=>$('dzOverlay').classList.remove('aberto');
+  $('dzBtnSalvar').onclick=()=>Financeiro.salvarDizimo();
+  $('ofBtnCancelar').onclick=()=>$('ofOverlay').classList.remove('aberto');
+  $('ofBtnSalvar').onclick=()=>Financeiro.salvarOferta();
+  $('saBtnCancelar').onclick=()=>$('saOverlay').classList.remove('aberto');
+  $('saBtnSalvar').onclick=()=>Financeiro.salvarSaida();
+
+  /* ========================================================================
+     MÓDULO ESCALAS E DEPARTAMENTOS
+     ======================================================================== */
+  const Escalas = {
+    pronto:false, sub:'cultos', membros:[], mapaMembros:{}, escalas:[], departamentos:[], partDepId:null,
+
+    async iniciar(){
+      if(!Escalas.pronto){
+        document.querySelectorAll('.subtab[data-esc]').forEach(b=>b.onclick=()=>{
+          document.querySelectorAll('.subtab[data-esc]').forEach(x=>x.classList.toggle('ativo', x===b));
+          Escalas.sub=b.dataset.esc; Escalas.recarregar();
+        });
+        await Escalas.carregarMembros();
+        Escalas.pronto=true;
+      }
+      await Escalas.recarregar();
+    },
+    async carregarMembros(){
+      const {data}=await sb.from('membros').select('id,nome').eq('situacao','ativo').order('nome');
+      Escalas.membros=data||[];
+      Escalas.mapaMembros={}; Escalas.membros.forEach(m=>Escalas.mapaMembros[m.id]=m.nome);
+      // selects por NOME (campos de escala guardam o nome)
+      const optsNome='<option value="">--</option>'+Escalas.membros.map(m=>`<option value="${esc(m.nome)}">${esc(m.nome)}</option>`).join('');
+      document.querySelectorAll('.selMembro').forEach(s=>s.innerHTML=optsNome);
+      // selects por ID (líder e participante)
+      const optsId='<option value="">--</option>'+Escalas.membros.map(m=>`<option value="${m.id}">${esc(m.nome)}</option>`).join('');
+      $('dep_lider').innerHTML=optsId; $('part_membro').innerHTML=optsId;
+    },
+    async recarregar(){
+      if(Escalas.sub==='departamentos'){ await Escalas.carregarDepartamentos(); Escalas.renderDepartamentos(); }
+      else { await Escalas.carregarEscalas(); Escalas.renderEscalas(); }
+    },
+    async carregarEscalas(){
+      const {data,error}=await sb.from('escalas').select('*').eq('situacao','ativo').order('data_evento',{ascending:false});
+      if(error){ $('escLista').innerHTML=`<tr><td colspan="6" class="vazio">Erro: ${esc(error.message)}</td></tr>`; return; }
+      Escalas.escalas=data||[];
+    },
+    renderEscalas(){
+      const ehCeia=Escalas.sub==='ceia';
+      const itens=Escalas.escalas.filter(e=> ehCeia ? (e.tipo||'').toUpperCase()==='CEIA' : (e.tipo||'').toUpperCase()!=='CEIA');
+      $('escInfo').textContent=`${itens.length} ${ehCeia?'ceia(s)':'culto(s)/evento(s)'} cadastrado(s)`;
+      const cols = ehCeia ? ['Data','Nome','Preparo','Pão','Vinho','Uva','Descarte',''] : ['Data','Nome','Portaria','Oferta','P. Introdutória',''];
+      $('escThead').innerHTML='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+      if(!itens.length){ $('escLista').innerHTML=`<tr><td colspan="8" class="vazio">Nada cadastrado aqui ainda.</td></tr>`; return; }
+      $('escLista').innerHTML=itens.map(e=>{
+        const acoes=`<span class="acao" data-edit="${e.id}">Editar</span><span class="acao del" data-del="${e.id}">Excluir</span>`;
+        if(ehCeia) return `<tr><td>${esc(fmtData(e.data_evento))}</td><td>${esc(e.nome)}</td><td>${esc(e.preparo||'-')}</td><td>${esc(e.servir_pao||'-')}</td><td>${esc(e.servir_vinho||'-')}</td><td>${esc(e.servir_uva||'-')}</td><td>${esc(e.descarte||'-')}</td><td>${acoes}</td></tr>`;
+        return `<tr><td>${esc(fmtData(e.data_evento))}</td><td>${esc(e.nome)}</td><td>${esc(e.portaria||'-')}</td><td>${esc(e.oferta||'-')}</td><td>${esc(e.palavra_introducao||'-')}</td><td>${acoes}</td></tr>`;
+      }).join('');
+      $('escLista').querySelectorAll('[data-edit]').forEach(el=>el.onclick=()=>Escalas.abrirEditarEscala(el.dataset.edit));
+      $('escLista').querySelectorAll('[data-del]').forEach(el=>el.onclick=()=>Escalas.excluirEscala(el.dataset.del));
+    },
+    esToggle(tipo){
+      const geral=tipo!=='CEIA';
+      document.querySelectorAll('.es-geral').forEach(e=>e.style.display=geral?'':'none');
+      document.querySelectorAll('.es-ceia').forEach(e=>e.style.display=geral?'none':'');
+    },
+    novoEscala(tipo){
+      $('es_id').value=''; $('es_tipo').value=tipo;
+      ['nome','obs'].forEach(c=>$('es_'+c).value='');
+      $('es_data').value=new Date().toISOString().slice(0,10);
+      ['portaria','oferta','palavra_introducao','preparo','servir_pao','servir_vinho','servir_uva','descarte'].forEach(c=>{const el=$('es_'+c); if(el) el.value='';});
+      $('esTitulo').textContent = tipo==='CEIA'?'Nova Santa Ceia':'Novo culto / evento';
+      $('esMsg').className='msg'; Escalas.esToggle(tipo); $('esOverlay').classList.add('aberto');
+    },
+    abrirEditarEscala(id){
+      const e=Escalas.escalas.find(x=>x.id===id); if(!e) return;
+      const tipo=(e.tipo||'').toUpperCase()==='CEIA'?'CEIA':'GERAL';
+      $('es_id').value=e.id; $('es_tipo').value=tipo;
+      $('es_nome').value=e.nome||''; $('es_obs').value=e.observacoes||''; $('es_data').value=(e.data_evento||'').slice(0,10);
+      ['portaria','oferta','palavra_introducao','preparo','servir_pao','servir_vinho','servir_uva','descarte'].forEach(c=>{const el=$('es_'+c); if(el) el.value=e[c]||'';});
+      $('esTitulo').textContent='Editar escala'; $('esMsg').className='msg'; Escalas.esToggle(tipo); $('esOverlay').classList.add('aberto');
+    },
+    async salvarEscala(){
+      const msg=$('esMsg'); const nome=$('es_nome').value.trim(); const data=$('es_data').value;
+      if(!nome){ msg.className='msg erro'; msg.textContent='Informe o nome.'; return; }
+      if(!data){ msg.className='msg erro'; msg.textContent='Informe a data.'; return; }
+      const tipo=$('es_tipo').value;
+      const reg={ nome, data_evento:data, tipo, observacoes:$('es_obs').value.trim()||null,
+        portaria:$('es_portaria').value||null, oferta:$('es_oferta').value||null, palavra_introducao:$('es_palavra_introducao').value||null,
+        preparo:$('es_preparo').value||null, servir_pao:$('es_servir_pao').value||null, servir_vinho:$('es_servir_vinho').value||null,
+        servir_uva:$('es_servir_uva').value||null, descarte:$('es_descarte').value||null };
+      $('esBtnSalvar').disabled=true; msg.className='msg info'; msg.textContent='Salvando...';
+      const id=$('es_id').value;
+      const {error}= id ? await sb.from('escalas').update(reg).eq('id',id) : await sb.from('escalas').insert(reg);
+      $('esBtnSalvar').disabled=false;
+      if(error){ msg.className='msg erro'; msg.textContent='Erro: '+error.message; return; }
+      $('esOverlay').classList.remove('aberto'); Escalas.recarregar();
+    },
+    async excluirEscala(id){ if(!confirm('Excluir esta escala?')) return;
+      const {error}=await sb.from('escalas').update({situacao:'inativo'}).eq('id',id);
+      if(error){ alert('Erro: '+error.message); return; } Escalas.recarregar(); },
+
+    /* ---- departamentos ---- */
+    async carregarDepartamentos(){
+      const {data,error}=await sb.from('departamentos').select('*').eq('situacao','ativo').order('ordem').order('nome');
+      if(error){ $('escLista').innerHTML=`<tr><td colspan="6" class="vazio">Erro: ${esc(error.message)}</td></tr>`; return; }
+      Escalas.departamentos=data||[];
+    },
+    renderDepartamentos(){
+      $('escInfo').textContent=`${Escalas.departamentos.length} departamento(s)`;
+      $('escThead').innerHTML='<tr><th>Nome</th><th>Líder</th><th>Descrição</th><th></th></tr>';
+      if(!Escalas.departamentos.length){ $('escLista').innerHTML=`<tr><td colspan="4" class="vazio">Nenhum departamento ainda.</td></tr>`; return; }
+      $('escLista').innerHTML=Escalas.departamentos.map(d=>`<tr>
+        <td><b>${esc(d.nome)}</b></td><td>${esc(Escalas.mapaMembros[d.lider_membro_id]||'-')}</td><td>${esc(d.descricao||'-')}</td>
+        <td><span class="acao conv" data-part="${d.id}" data-nome="${esc(d.nome)}">Participantes</span><span class="acao" data-edit="${d.id}">Editar</span><span class="acao del" data-del="${d.id}">Excluir</span></td></tr>`).join('');
+      $('escLista').querySelectorAll('[data-edit]').forEach(el=>el.onclick=()=>Escalas.abrirEditarDep(el.dataset.edit));
+      $('escLista').querySelectorAll('[data-del]').forEach(el=>el.onclick=()=>Escalas.excluirDep(el.dataset.del));
+      $('escLista').querySelectorAll('[data-part]').forEach(el=>el.onclick=()=>Escalas.abrirParticipantes(el.dataset.part, el.dataset.nome));
+    },
+    novoDep(){ $('dep_id').value=''; $('dep_nome').value=''; $('dep_descricao').value=''; $('dep_lider').value=''; $('depTitulo').textContent='Novo departamento'; $('depMsg').className='msg'; $('depOverlay').classList.add('aberto'); },
+    abrirEditarDep(id){ const d=Escalas.departamentos.find(x=>x.id===id); if(!d) return;
+      $('dep_id').value=d.id; $('dep_nome').value=d.nome||''; $('dep_descricao').value=d.descricao||''; $('dep_lider').value=d.lider_membro_id||'';
+      $('depTitulo').textContent='Editar departamento'; $('depMsg').className='msg'; $('depOverlay').classList.add('aberto'); },
+    async salvarDep(){
+      const msg=$('depMsg'); const nome=$('dep_nome').value.trim();
+      if(!nome){ msg.className='msg erro'; msg.textContent='Informe o nome.'; return; }
+      const reg={ nome, descricao:$('dep_descricao').value.trim()||null, lider_membro_id:$('dep_lider').value||null };
+      $('depBtnSalvar').disabled=true; msg.className='msg info'; msg.textContent='Salvando...';
+      const id=$('dep_id').value;
+      const {error}= id ? await sb.from('departamentos').update(reg).eq('id',id) : await sb.from('departamentos').insert(reg);
+      $('depBtnSalvar').disabled=false;
+      if(error){ msg.className='msg erro'; msg.textContent='Erro: '+error.message; return; }
+      $('depOverlay').classList.remove('aberto'); Escalas.recarregar();
+    },
+    async excluirDep(id){ if(!confirm('Excluir este departamento?')) return;
+      const {error}=await sb.from('departamentos').update({situacao:'inativo'}).eq('id',id);
+      if(error){ alert('Erro: '+error.message); return; } Escalas.recarregar(); },
+
+    /* ---- participantes ---- */
+    async abrirParticipantes(depId, nome){
+      Escalas.partDepId=depId; $('partTitulo').textContent='Participantes - '+nome;
+      $('part_membro').value=''; $('part_funcao').value='';
+      $('partOverlay').classList.add('aberto'); await Escalas.carregarParticipantes();
+    },
+    async carregarParticipantes(){
+      const {data}=await sb.from('membros_departamentos').select('id, funcao, membros(nome)').eq('departamento_id',Escalas.partDepId).eq('situacao','ativo');
+      const lista=data||[];
+      if(!lista.length){ $('partLista').innerHTML='<div style="color:var(--cinza);font-size:13px;">Nenhum participante ainda.</div>'; return; }
+      $('partLista').innerHTML=lista.map(p=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);">
+        <span>${esc(p.membros?p.membros.nome:'-')}${p.funcao?` <span style="color:var(--cinza);font-size:12px;">(${esc(p.funcao)})</span>`:''}</span>
+        <span class="acao del" data-rem="${p.id}">Remover</span></div>`).join('');
+      $('partLista').querySelectorAll('[data-rem]').forEach(el=>el.onclick=()=>Escalas.removerParticipante(el.dataset.rem));
+    },
+    async addParticipante(){
+      const membro=$('part_membro').value; if(!membro){ alert('Selecione um membro.'); return; }
+      const {error}=await sb.from('membros_departamentos').insert({ membro_id:membro, departamento_id:Escalas.partDepId, funcao:$('part_funcao').value.trim()||'Membro' });
+      if(error){ alert('Erro: '+error.message); return; }
+      $('part_membro').value=''; $('part_funcao').value=''; Escalas.carregarParticipantes();
+    },
+    async removerParticipante(id){ const {error}=await sb.from('membros_departamentos').update({situacao:'inativo'}).eq('id',id);
+      if(error){ alert('Erro: '+error.message); return; } Escalas.carregarParticipantes(); }
+  };
+  $('escBtnNovo').onclick=()=>{ if(Escalas.sub==='departamentos') Escalas.novoDep(); else Escalas.novoEscala(Escalas.sub==='ceia'?'CEIA':'GERAL'); };
+  $('esBtnCancelar').onclick=()=>$('esOverlay').classList.remove('aberto');
+  $('esBtnSalvar').onclick=()=>Escalas.salvarEscala();
+  $('depBtnCancelar').onclick=()=>$('depOverlay').classList.remove('aberto');
+  $('depBtnSalvar').onclick=()=>Escalas.salvarDep();
+  $('partBtnFechar').onclick=()=>{ $('partOverlay').classList.remove('aberto'); if(Escalas.sub==='departamentos') Escalas.recarregar(); };
+  $('partBtnAdd').onclick=()=>Escalas.addParticipante();
+
+  /* ========================================================================
+     MÓDULO EBD (lições + chamada) - lado administrativo
+     ======================================================================== */
+  const EBD = {
+    pronto:false, classeId:null, membros:[], aulas:[], chAula:null, chMatriculas:{}, chMapa:{},
+
+    async iniciar(){
+      if(!EBD.pronto){
+        await EBD.garantirClasse();
+        const {data}=await sb.from('membros').select('id,nome').eq('situacao','ativo').order('nome');
+        EBD.membros=data||[];
+        EBD.pronto=true;
+      }
+      await EBD.carregar();
+    },
+    async garantirClasse(){
+      let {data}=await sb.from('ebd_classes').select('id').eq('nome','Adulto').eq('situacao','ativo').limit(1);
+      if(data&&data.length){ EBD.classeId=data[0].id; return; }
+      const ins=await sb.from('ebd_classes').insert({nome:'Adulto', faixa_etaria:'Adulto'}).select('id').single();
+      if(!ins.error) EBD.classeId=ins.data.id;
+    },
+    async carregar(){
+      const {data,error}=await sb.from('ebd_aulas').select('*').eq('situacao','ativo').order('data',{ascending:false});
+      if(error){ $('ebdLista').innerHTML=`<tr><td colspan="5" class="vazio">Erro: ${esc(error.message)}</td></tr>`; return; }
+      EBD.aulas=data||[];
+      $('ebdInfo').textContent=`${EBD.aulas.length} lição(ões) cadastrada(s).`;
+      if(!EBD.aulas.length){ $('ebdLista').innerHTML='<tr><td colspan="5" class="vazio">Nenhuma lição ainda.</td></tr>'; return; }
+      $('ebdLista').innerHTML=EBD.aulas.map(a=>`<tr>
+        <td>${esc(a.licao||'-')}</td><td>${esc(a.titulo)}</td><td>${esc(fmtData(a.data))}</td>
+        <td>${a.link?`<a href="${esc(a.link)}" target="_blank" rel="noopener">abrir</a>`:'-'}</td>
+        <td><span class="acao conv" data-ch="${a.id}" data-tit="${esc(a.titulo)}">Chamada</span><span class="acao" data-edit="${a.id}">Editar</span><span class="acao del" data-del="${a.id}">Excluir</span></td></tr>`).join('');
+      $('ebdLista').querySelectorAll('[data-edit]').forEach(el=>el.onclick=()=>EBD.abrirEditar(el.dataset.edit));
+      $('ebdLista').querySelectorAll('[data-del]').forEach(el=>el.onclick=()=>EBD.excluir(el.dataset.del));
+      $('ebdLista').querySelectorAll('[data-ch]').forEach(el=>el.onclick=()=>EBD.abrirChamada(el.dataset.ch, el.dataset.tit));
+    },
+    nova(){ $('lic_id').value=''; ['licao','titulo','link','descricao'].forEach(c=>$('lic_'+c).value=''); $('lic_data').value=new Date().toISOString().slice(0,10); $('licTitulo').textContent='Nova lição'; $('licMsg').className='msg'; $('licOverlay').classList.add('aberto'); },
+    abrirEditar(id){ const a=EBD.aulas.find(x=>x.id===id); if(!a) return;
+      $('lic_id').value=a.id; $('lic_licao').value=a.licao||''; $('lic_titulo').value=a.titulo||''; $('lic_data').value=(a.data||'').slice(0,10); $('lic_link').value=a.link||''; $('lic_descricao').value=a.descricao||'';
+      $('licTitulo').textContent='Editar lição'; $('licMsg').className='msg'; $('licOverlay').classList.add('aberto'); },
+    async salvar(){
+      const msg=$('licMsg'); const titulo=$('lic_titulo').value.trim(); const data=$('lic_data').value;
+      if(!titulo){ msg.className='msg erro'; msg.textContent='Informe o título.'; return; }
+      if(!data){ msg.className='msg erro'; msg.textContent='Informe a data.'; return; }
+      let link=$('lic_link').value.trim(); if(link && !/^https?:/i.test(link)) link='https://'+link;
+      const reg={ classe_id:EBD.classeId, licao:$('lic_licao').value.trim()||null, titulo, data, link:link||null, descricao:$('lic_descricao').value.trim()||null };
+      $('licBtnSalvar').disabled=true; msg.className='msg info'; msg.textContent='Salvando...';
+      const id=$('lic_id').value;
+      const {error}= id ? await sb.from('ebd_aulas').update(reg).eq('id',id) : await sb.from('ebd_aulas').insert(reg);
+      $('licBtnSalvar').disabled=false;
+      if(error){ msg.className='msg erro'; msg.textContent='Erro: '+error.message; return; }
+      $('licOverlay').classList.remove('aberto'); EBD.carregar();
+    },
+    async excluir(id){ if(!confirm('Excluir esta lição?')) return;
+      const {error}=await sb.from('ebd_aulas').update({situacao:'inativo'}).eq('id',id);
+      if(error){ alert('Erro: '+error.message); return; } EBD.carregar(); },
+
+    /* ---- chamada ---- */
+    async abrirChamada(aulaId, titulo){
+      EBD.chAula=aulaId; $('chTitulo').textContent='Chamada - '+titulo;
+      $('chLista').innerHTML='<div style="color:var(--cinza);">Carregando...</div>'; $('chOverlay').classList.add('aberto');
+      await EBD.garantirMatriculas();
+      const {data}=await sb.from('ebd_chamada').select('id, matricula_id, presente').eq('aula_id',aulaId);
+      EBD.chMapa={}; (data||[]).forEach(c=>EBD.chMapa[c.matricula_id]={id:c.id, presente:c.presente});
+      EBD.renderChamada();
+    },
+    async garantirMatriculas(){
+      const {data}=await sb.from('ebd_matriculas').select('id, membro_id').eq('classe_id',EBD.classeId).eq('situacao','ativo');
+      EBD.chMatriculas={}; (data||[]).forEach(m=>EBD.chMatriculas[m.membro_id]=m.id);
+      const faltam=EBD.membros.filter(m=>!EBD.chMatriculas[m.id]);
+      if(faltam.length){
+        const novos=faltam.map(m=>({classe_id:EBD.classeId, membro_id:m.id}));
+        const ins=await sb.from('ebd_matriculas').insert(novos).select('id, membro_id');
+        if(!ins.error) (ins.data||[]).forEach(m=>EBD.chMatriculas[m.membro_id]=m.id);
+      }
+    },
+    renderChamada(){
+      let pres=0;
+      const linhas=EBD.membros.map(m=>{
+        const mat=EBD.chMatriculas[m.id]; const st=EBD.chMapa[mat];
+        const ehP = st && st.presente===true; if(ehP) pres++;
+        return `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);">
+          <span>${esc(m.nome)}</span>
+          <span style="display:flex;gap:6px;">
+            <button class="btn ${ehP?'':'sec'}" data-pres="${mat}" style="padding:5px 10px;font-size:12px;${ehP?'background:linear-gradient(135deg,#16a34a,#22c55e);':''}">Presente</button>
+            <button class="btn ${st&&st.presente===false?'':'sec'}" data-falta="${mat}" style="padding:5px 10px;font-size:12px;${st&&st.presente===false?'background:#b3261e;':''}">Falta</button>
+          </span></div>`;
+      }).join('');
+      $('chResumo').textContent=`✅ ${pres} presente(s) de ${EBD.membros.length} membro(s)`;
+      $('chLista').innerHTML=linhas;
+      $('chLista').querySelectorAll('[data-pres]').forEach(el=>el.onclick=()=>EBD.marcar(el.dataset.pres, true));
+      $('chLista').querySelectorAll('[data-falta]').forEach(el=>el.onclick=()=>EBD.marcar(el.dataset.falta, false));
+    },
+    async marcar(matriculaId, presente){
+      const atual=EBD.chMapa[matriculaId];
+      if(atual){ await sb.from('ebd_chamada').update({presente}).eq('id',atual.id); atual.presente=presente; }
+      else { const ins=await sb.from('ebd_chamada').insert({aula_id:EBD.chAula, matricula_id:matriculaId, presente}).select('id').single();
+        if(!ins.error) EBD.chMapa[matriculaId]={id:ins.data.id, presente}; }
+      EBD.renderChamada();
+    }
+  };
+  $('ebdBtnNova').onclick=()=>EBD.nova();
+  $('licBtnCancelar').onclick=()=>$('licOverlay').classList.remove('aberto');
+  $('licBtnSalvar').onclick=()=>EBD.salvar();
+  $('chBtnFechar').onclick=()=>$('chOverlay').classList.remove('aberto');
+
+  /* ========================================================================
+     LOGIN (Supabase Auth) - equipe entra por e-mail e senha
+     ======================================================================== */
+  function entrarApp(){
+    document.body.classList.add('logado');
+    if(!jaCarregou.membros){ jaCarregou.membros=true; Membros.carregar(); }
+  }
+  function sairApp(){ document.body.classList.remove('logado'); }
+
+  async function fazerLogin(){
+    const msg=$('lg_msg'); const email=$('lg_email').value.trim(); const senha=$('lg_senha').value;
+    if(!email || !senha){ msg.className='msg erro'; msg.textContent='Preencha e-mail e senha.'; return; }
+    $('lg_btn').disabled=true; msg.className='msg info'; msg.textContent='Entrando...';
+    const { error } = await sb.auth.signInWithPassword({ email, password: senha });
+    $('lg_btn').disabled=false;
+    if(error){ msg.className='msg erro'; msg.textContent = error.message.includes('Invalid') ? 'E-mail ou senha incorretos.' : error.message; return; }
+    msg.className='msg';
+  }
+
+  if(configOK){
+    $('lg_btn').onclick = fazerLogin;
+    $('lg_senha').addEventListener('keydown', e => { if(e.key==='Enter') fazerLogin(); });
+    $('navSair').onclick = async () => { await sb.auth.signOut(); };
+    sb.auth.onAuthStateChange((_evt, session) => { if(session) entrarApp(); else sairApp(); });
   }
 
   /* ---------- start ---------- */
-  iniciar();
+  if(!configOK){ $('cfgAviso').style.display='block'; document.body.classList.add('logado'); }
+  else { sb.auth.getSession().then(({data}) => { if(data.session) entrarApp(); else sairApp(); }); }
   </script>
 </body>
 </html>
